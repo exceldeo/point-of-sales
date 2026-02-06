@@ -71,6 +71,11 @@ export default function Print({ transaction }) {
         window.print();
     };
 
+    const goBack = () => {
+        event.preventDefault();
+        window.history.back();
+    };
+
     return (
         <>
             <Head title="Invoice Penjualan" />
@@ -79,12 +84,13 @@ export default function Print({ transaction }) {
                 <div className="max-w-4xl mx-auto space-y-6">
                     {/* Action Bar */}
                     <div className="flex flex-wrap items-center justify-between gap-3 print:hidden">
+                        {/* router back  */}
                         <Link
-                            href={route("transactions.index")}
+                            onClick={goBack}
                             className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
                         >
                             <IconArrowLeft size={18} />
-                            Kembali ke kasir
+                            Kembali
                         </Link>
 
                         <div className="flex items-center gap-2">
@@ -198,7 +204,7 @@ export default function Print({ transaction }) {
                                         </p>
                                         <p className="text-sm opacity-80 print:opacity-100 mt-1">
                                             {formatDateTime(
-                                                transaction.created_at
+                                                transaction.created_at,
                                             )}
                                         </p>
                                     </div>
@@ -317,7 +323,7 @@ export default function Print({ transaction }) {
                                         <span>
                                             {formatPrice(
                                                 transaction.grand_total +
-                                                    (transaction.discount || 0)
+                                                    (transaction.discount || 0),
                                             )}
                                         </span>
                                     </div>
@@ -332,7 +338,7 @@ export default function Print({ transaction }) {
                                         <span>Total</span>
                                         <span>
                                             {formatPrice(
-                                                transaction.grand_total
+                                                transaction.grand_total,
                                             )}
                                         </span>
                                     </div>
@@ -342,7 +348,7 @@ export default function Print({ transaction }) {
                                                 <span>Tunai</span>
                                                 <span>
                                                     {formatPrice(
-                                                        transaction.cash
+                                                        transaction.cash,
                                                     )}
                                                 </span>
                                             </div>
@@ -350,7 +356,7 @@ export default function Print({ transaction }) {
                                                 <span>Kembali</span>
                                                 <span>
                                                     {formatPrice(
-                                                        transaction.change
+                                                        transaction.change,
                                                     )}
                                                 </span>
                                             </div>

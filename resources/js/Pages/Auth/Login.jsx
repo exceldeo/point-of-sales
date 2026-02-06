@@ -152,7 +152,7 @@ export default function Login({ status, canResetPassword }) {
                                         onChange={(e) =>
                                             setData(
                                                 "remember",
-                                                e.target.checked
+                                                e.target.checked,
                                             )
                                         }
                                         className="w-4 h-4 rounded border-slate-300 dark:border-slate-600 text-primary-500 focus:ring-primary-500"
@@ -192,7 +192,7 @@ export default function Login({ status, canResetPassword }) {
                             </button>
 
                             {/* Register Link */}
-                            <p className="text-center text-sm text-slate-600 dark:text-slate-400">
+                            {/* <p className="text-center text-sm text-slate-600 dark:text-slate-400">
                                 Belum punya akun?{" "}
                                 <Link
                                     href="/register"
@@ -200,7 +200,7 @@ export default function Login({ status, canResetPassword }) {
                                 >
                                     Daftar Sekarang
                                 </Link>
-                            </p>
+                            </p> */}
                         </form>
                     </div>
                 </div>

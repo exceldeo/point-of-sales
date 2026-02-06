@@ -16,9 +16,9 @@ class UserSeeder extends Seeder
     public function run(): void
     {
         $user = User::create([
-            'name' => 'Arya Dwi Putra',
-            'email' => 'arya@gmail.com',
-            'password' => bcrypt('password'),
+            'name' => 'Admin',
+            'email' => 'admin@gmail.com',
+            'password' => bcrypt('admin'),
         ]);
 
         // get admin role
@@ -33,14 +33,16 @@ class UserSeeder extends Seeder
         // assign a role to user
         $user->assignRole($role);
 
-        $cashier = User::create([
-            'name' => 'Cashier',
-            'email' => 'cashier@gmail.com',
-            'password' => bcrypt('password'),
+        $kasir = User::create([
+            'name' => 'Kasir',
+            'email' => 'kasir@gmail.com',
+            'password' => bcrypt('kasir'),
         ]);
 
-        $transactionsPermission = Permission::where('name', 'transactions-access')->first();
-
-        $cashier->syncPermissions($transactionsPermission);
+        // get kasir role
+        $kasirRole = Role::where('name', 'kasir')->first();
+        
+        // assign a role to kasir
+        $kasir->assignRole($kasirRole);
     }
 }

@@ -14,6 +14,7 @@ import {
     IconFilter,
     IconX,
 } from "@tabler/icons-react";
+import hasAnyPermission from "@/Utils/Permission";
 
 const defaultFilters = {
     invoice: "",
@@ -137,7 +138,7 @@ const History = ({ transactions, filters }) => {
                                         onChange={(e) =>
                                             handleChange(
                                                 "invoice",
-                                                e.target.value
+                                                e.target.value,
                                             )
                                         }
                                         className="w-full h-11 px-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-200 placeholder-slate-400 focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all"
@@ -153,7 +154,7 @@ const History = ({ transactions, filters }) => {
                                         onChange={(e) =>
                                             handleChange(
                                                 "start_date",
-                                                e.target.value
+                                                e.target.value,
                                             )
                                         }
                                         className="w-full h-11 px-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-200 focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all"
@@ -169,7 +170,7 @@ const History = ({ transactions, filters }) => {
                                         onChange={(e) =>
                                             handleChange(
                                                 "end_date",
-                                                e.target.value
+                                                e.target.value,
                                             )
                                         }
                                         className="w-full h-11 px-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-200 focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all"
@@ -226,9 +227,13 @@ const History = ({ transactions, filters }) => {
                                         <th className="px-4 py-4 text-right text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
                                             Total
                                         </th>
-                                        <th className="px-4 py-4 text-right text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-                                            Profit
-                                        </th>
+                                        {hasAnyPermission([
+                                            "profits-access",
+                                        ]) && (
+                                            <th className="px-4 py-4 text-right text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                                                Profit
+                                            </th>
+                                        )}
                                         <th className="px-4 py-4 text-center text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider"></th>
                                     </tr>
                                 </thead>
@@ -269,20 +274,25 @@ const History = ({ transactions, filters }) => {
                                             </td>
                                             <td className="px-4 py-4 text-right text-sm font-semibold text-slate-900 dark:text-white">
                                                 {formatCurrency(
-                                                    transaction.grand_total ?? 0
+                                                    transaction.grand_total ??
+                                                        0,
                                                 )}
                                             </td>
-                                            <td className="px-4 py-4 text-right text-sm font-semibold text-success-600 dark:text-success-400">
-                                                {formatCurrency(
-                                                    transaction.total_profit ??
-                                                        0
-                                                )}
-                                            </td>
+                                            {hasAnyPermission([
+                                                "profits-access",
+                                            ]) && (
+                                                <td className="px-4 py-4 text-right text-sm font-semibold text-success-600 dark:text-success-400">
+                                                    {formatCurrency(
+                                                        transaction.total_profit ??
+                                                            0,
+                                                    )}
+                                                </td>
+                                            )}
                                             <td className="px-4 py-4 text-center">
                                                 <Link
                                                     href={route(
                                                         "transactions.print",
-                                                        transaction.invoice
+                                                        transaction.invoice,
                                                     )}
                                                     className="inline-flex items-center justify-center w-8 h-8 rounded-lg text-slate-500 hover:text-primary-600 hover:bg-primary-50 dark:hover:bg-primary-950/50 transition-colors"
                                                     title="Cetak Struk"

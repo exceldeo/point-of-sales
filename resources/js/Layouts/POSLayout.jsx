@@ -12,6 +12,7 @@ import {
     IconX,
     IconUser,
 } from "@tabler/icons-react";
+import hasAnyPermission from "@/Utils/Permission";
 
 export default function POSLayout({ children }) {
     const { auth } = usePage().props;
@@ -68,19 +69,17 @@ export default function POSLayout({ children }) {
                     </button>
 
                     {/* Logo */}
-                    <Link
+                    {/* <Link
                         href={route("dashboard")}
                         className="flex items-center gap-2"
-                    >
-                        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center">
-                            <span className="text-white font-bold text-sm">
-                                K
-                            </span>
-                        </div>
-                        <span className="hidden sm:block text-lg font-bold text-slate-800 dark:text-white">
-                            KASIR
-                        </span>
-                    </Link>
+                    > */}
+                    <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center">
+                        <span className="text-white font-bold text-sm">K</span>
+                    </div>
+                    <span className="hidden sm:block text-lg font-bold text-slate-800 dark:text-white">
+                        KASIR
+                    </span>
+                    {/* </Link> */}
 
                     {/* Divider */}
                     <div className="hidden md:block w-px h-8 bg-slate-200 dark:bg-slate-700" />
@@ -100,13 +99,15 @@ export default function POSLayout({ children }) {
                 <div className="flex items-center gap-2 lg:gap-3">
                     {/* Quick Actions */}
                     <nav className="hidden lg:flex items-center gap-1">
-                        <Link
-                            href={route("dashboard")}
-                            className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100 dark:text-slate-400 dark:hover:text-white dark:hover:bg-slate-800 transition-colors"
-                        >
-                            <IconHome size={18} />
-                            <span>Dashboard</span>
-                        </Link>
+                        {hasAnyPermission(["dashboard-access"]) && (
+                            <Link
+                                href={route("dashboard")}
+                                className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100 dark:text-slate-400 dark:hover:text-white dark:hover:bg-slate-800 transition-colors"
+                            >
+                                <IconHome size={18} />
+                                <span>Dashboard</span>
+                            </Link>
+                        )}
                         <Link
                             href={route("transactions.history")}
                             className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100 dark:text-slate-400 dark:hover:text-white dark:hover:bg-slate-800 transition-colors"
@@ -176,13 +177,17 @@ export default function POSLayout({ children }) {
                         onClick={(e) => e.stopPropagation()}
                     >
                         <nav className="p-4 space-y-2">
-                            <Link
-                                href={route("dashboard")}
-                                className="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800 transition-colors"
-                            >
-                                <IconHome size={20} />
-                                <span className="font-medium">Dashboard</span>
-                            </Link>
+                            {hasAnyPermission(["dashboard-access"]) && (
+                                <Link
+                                    href={route("dashboard")}
+                                    className="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800 transition-colors"
+                                >
+                                    <IconHome size={20} />
+                                    <span className="font-medium">
+                                        Dashboard
+                                    </span>
+                                </Link>
+                            )}
                             <Link
                                 href={route("transactions.history")}
                                 className="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800 transition-colors"

@@ -8,6 +8,8 @@ import Pagination from "@/Components/Dashboard/Pagination";
 export default function Index() {
     const { permissions } = usePage().props;
 
+    console.log(permissions);
+
     return (
         <>
             <Head title="Hak Akses" />
@@ -38,7 +40,7 @@ export default function Index() {
 
             {/* Permissions Grid */}
             {permissions.data.length > 0 ? (
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
                     {permissions.data.map((permission, i) => (
                         <div
                             key={permission.id || i}

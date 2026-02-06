@@ -423,7 +423,7 @@ class TransactionController extends Controller
         ) {
             $transaction = Transaction::create([
                 'cashier_id'     => auth()->user()->id,
-                'customer_id'    => $request->customer_id,
+                'customer_id'    => $request->customer_id ?: null,
                 'invoice'        => $invoice,
                 'cash'           => $cashAmount,
                 'change'         => $changeAmount,

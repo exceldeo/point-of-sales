@@ -13,23 +13,25 @@ class RoleSeeder extends Seeder
     // Refactor the RoleSeeder to improve readability and avoid repetitive code
     public function run(): void
     {
-        $this->createRoleWithPermissions('users-access', '%users%');
-        $this->createRoleWithPermissions('roles-access', '%roles%');
-        $this->createRoleWithPermissions('permission-access', '%permissions%');
-        $this->createRoleWithPermissions('categories-access', '%categories%');
-        $this->createRoleWithPermissions('products-access', '%products%');
-        $this->createRoleWithPermissions('customers-access', '%customers%');
-        $this->createRoleWithPermissions('transactions-access', '%transactions%');
-        $this->createRoleWithPermissions('reports-access', '%reports%');
-        $this->createRoleWithPermissions('profits-access', '%profits%');
-        $this->createRoleWithPermissions('payment-settings-access', '%payment-settings%');
+        // $this->createRoleWithPermissions('users-access', '%users%');
+        // $this->createRoleWithPermissions('roles-access', '%roles%');
+        // $this->createRoleWithPermissions('permission-access', '%permissions%');
+        // $this->createRoleWithPermissions('categories-access', '%categories%');
+        // $this->createRoleWithPermissions('products-access', '%products%');
+        // $this->createRoleWithPermissions('customers-access', '%customers%');
+        // $this->createRoleWithPermissions('transactions-access', '%transactions%');
+        // $this->createRoleWithPermissions('reports-access', '%reports%');
+        // $this->createRoleWithPermissions('profits-access', '%profits%');
+        // $this->createRoleWithPermissions('payment-settings-access', '%payment-settings%');
 
-        Role::create(['name' => 'super-admin']);
+        // Create super-admin role with all permissions
+        $superAdminRole = Role::create(['name' => 'super-admin']);
+        $allPermissions  = Permission::all();
+        $superAdminRole->givePermissionTo($allPermissions);
 
         // Create cashier role with basic permissions for public registration
-        $cashierRole        = Role::create(['name' => 'cashier']);
+        $cashierRole        = Role::create(['name' => 'kasir']);
         $cashierPermissions = Permission::whereIn('name', [
-            'dashboard-access',
             'transactions-access',
             'customers-access',
             'customers-create',

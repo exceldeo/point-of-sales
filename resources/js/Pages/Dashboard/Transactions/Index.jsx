@@ -59,7 +59,7 @@ export default function Index({
     const [discountInput, setDiscountInput] = useState("");
     const [cashInput, setCashInput] = useState("");
     const [paymentMethod, setPaymentMethod] = useState(
-        defaultPaymentGateway ?? "cash"
+        defaultPaymentGateway ?? "cash",
     );
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [mobileView, setMobileView] = useState("products"); // 'products' | 'cart'
@@ -78,7 +78,7 @@ export default function Index({
     const handleBarcodeScan = useCallback(
         (barcode) => {
             const product = products.find(
-                (p) => p.barcode?.toLowerCase() === barcode.toLowerCase()
+                (p) => p.barcode?.toLowerCase() === barcode.toLowerCase(),
             );
 
             if (product) {
@@ -92,7 +92,7 @@ export default function Index({
                 toast.error(`Produk tidak ditemukan: ${barcode}`);
             }
         },
-        [products]
+        [products],
     );
 
     const { isScanning } = useBarcodeScanner(handleBarcodeScan, {
@@ -103,21 +103,21 @@ export default function Index({
     // Calculations
     const discount = useMemo(
         () => Math.max(0, Number(discountInput) || 0),
-        [discountInput]
+        [discountInput],
     );
     const subtotal = useMemo(() => carts_total ?? 0, [carts_total]);
     const payable = useMemo(
         () => Math.max(subtotal - discount, 0),
-        [subtotal, discount]
+        [subtotal, discount],
     );
     const isCashPayment = paymentMethod === "cash";
     const cash = useMemo(
         () => (isCashPayment ? Math.max(0, Number(cashInput) || 0) : payable),
-        [cashInput, isCashPayment, payable]
+        [cashInput, isCashPayment, payable],
     );
     const cartCount = useMemo(
         () => carts.reduce((total, item) => total + Number(item.qty), 0),
-        [carts]
+        [carts],
     );
 
     // Payment options
@@ -125,7 +125,7 @@ export default function Index({
         const options = Array.isArray(paymentGateways)
             ? paymentGateways.filter(
                   (gateway) =>
-                      gateway?.value && gateway.value.toLowerCase() !== "cash"
+                      gateway?.value && gateway.value.toLowerCase() !== "cash",
               )
             : [];
 
@@ -169,7 +169,7 @@ export default function Index({
                     toast.error("Gagal menambahkan produk");
                     setAddingProductId(null);
                 },
-            }
+            },
         );
     };
 
@@ -192,7 +192,7 @@ export default function Index({
                     toast.error(errors?.message || "Gagal update quantity");
                     setUpdatingCartId(null);
                 },
-            }
+            },
         );
     };
 
@@ -225,7 +225,7 @@ export default function Index({
                     toast.error(errors?.message || "Gagal menahan transaksi");
                     setIsHolding(false);
                 },
-            }
+            },
         );
     };
 
@@ -257,7 +257,7 @@ export default function Index({
                 case "F3":
                     e.preventDefault();
                     setMobileView(
-                        mobileView === "products" ? "cart" : "products"
+                        mobileView === "products" ? "cart" : "products",
                     );
                     break;
                 case "F4":
@@ -300,11 +300,6 @@ export default function Index({
             return;
         }
 
-        if (!selectedCustomer?.id) {
-            toast.error("Pilih pelanggan terlebih dahulu");
-            return;
-        }
-
         if (isCashPayment && cash < payable) {
             toast.error("Jumlah pembayaran kurang dari total");
             return;
@@ -315,7 +310,7 @@ export default function Index({
         router.post(
             route("transactions.store"),
             {
-                customer_id: selectedCustomer.id,
+                customer_id: selectedCustomer?.id || null,
                 discount,
                 grand_total: payable,
                 cash: isCashPayment ? cash : payable,
@@ -335,7 +330,7 @@ export default function Index({
                     setIsSubmitting(false);
                     toast.error("Gagal menyimpan transaksi");
                 },
-            }
+            },
         );
     };
 
@@ -478,7 +473,7 @@ export default function Index({
                                                 {item.product?.image ? (
                                                     <img
                                                         src={getProductImageUrl(
-                                                            item.product.image
+                                                            item.product.image,
                                                         )}
                                                         alt={item.product.title}
                                                         className="w-full h-full object-cover"
@@ -500,7 +495,7 @@ export default function Index({
                                                 <p className="text-xs text-slate-500">
                                                     {formatPrice(
                                                         item.product
-                                                            ?.sell_price || 0
+                                                            ?.sell_price || 0,
                                                     )}{" "}
                                                     × {item.qty}
                                                 </p>
@@ -512,8 +507,8 @@ export default function Index({
                                                             item.id,
                                                             Math.max(
                                                                 1,
-                                                                item.qty - 1
-                                                            )
+                                                                item.qty - 1,
+                                                            ),
                                                         )
                                                     }
                                                     disabled={item.qty <= 1}
@@ -528,7 +523,7 @@ export default function Index({
                                                     onClick={() =>
                                                         handleUpdateQty(
                                                             item.id,
-                                                            item.qty + 1
+                                                            item.qty + 1,
                                                         )
                                                     }
                                                     className="w-6 h-6 rounded flex items-center justify-center bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-300 text-xs"
@@ -538,7 +533,7 @@ export default function Index({
                                                 <button
                                                     onClick={() =>
                                                         handleRemoveFromCart(
-                                                            item.id
+                                                            item.id,
                                                         )
                                                     }
                                                     className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:text-danger-500 hover:bg-danger-50 dark:hover:bg-danger-950/50 ml-1"
@@ -629,7 +624,7 @@ export default function Index({
                                                     key={amt}
                                                     onClick={() =>
                                                         setCashInput(
-                                                            String(amt)
+                                                            String(amt),
                                                         )
                                                     }
                                                     className={`py-2 px-1 rounded-lg text-xs font-semibold transition-all ${
@@ -641,7 +636,7 @@ export default function Index({
                                                 >
                                                     {formatPrice(amt)}
                                                 </button>
-                                            )
+                                            ),
                                         )}
                                     </div>
                                 </div>
@@ -664,8 +659,8 @@ export default function Index({
                                             setDiscountInput(
                                                 e.target.value.replace(
                                                     /[^\d]/g,
-                                                    ""
-                                                )
+                                                    "",
+                                                ),
                                             )
                                         }
                                         placeholder="0"
@@ -692,8 +687,8 @@ export default function Index({
                                                 setCashInput(
                                                     e.target.value.replace(
                                                         /[^\d]/g,
-                                                        ""
-                                                    )
+                                                        "",
+                                                    ),
                                                 )
                                             }
                                             placeholder="0"
@@ -749,13 +744,11 @@ export default function Index({
                             onClick={handleSubmitTransaction}
                             disabled={
                                 !carts.length ||
-                                !selectedCustomer ||
                                 (paymentMethod === "cash" && cash < payable) ||
                                 isSubmitting
                             }
                             className={`w-full h-12 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 transition-all ${
                                 carts.length &&
-                                selectedCustomer &&
                                 (paymentMethod !== "cash" || cash >= payable)
                                     ? "bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white shadow-lg shadow-primary-500/30"
                                     : "bg-slate-200 dark:bg-slate-800 text-slate-400 cursor-not-allowed"
@@ -769,14 +762,12 @@ export default function Index({
                                     <span>
                                         {!carts.length
                                             ? "Keranjang Kosong"
-                                            : !selectedCustomer
-                                            ? "Pilih Pelanggan"
                                             : paymentMethod === "cash" &&
-                                              cash < payable
-                                            ? `Kurang ${formatPrice(
-                                                  payable - cash
-                                              )}`
-                                            : "Selesaikan Transaksi"}
+                                                cash < payable
+                                              ? `Kurang ${formatPrice(
+                                                    payable - cash,
+                                                )}`
+                                              : "Selesaikan Transaksi"}
                                     </span>
                                 </>
                             )}
