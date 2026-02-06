@@ -68,6 +68,7 @@ export default function Index({
 
     // Ref for search input to enable keyboard focus
     const searchInputRef = useRef(null);
+    const cashInputRef = useRef("");
 
     // Set default payment method
     useEffect(() => {
@@ -198,7 +199,9 @@ export default function Index({
 
     // Handle numpad confirm for cash input
     const handleNumpadConfirm = useCallback((value) => {
-        setCashInput(String(value));
+        const nextValue = String(value);
+        cashInputRef.current = nextValue;
+        setCashInput(nextValue);
     }, []);
 
     // Handle hold transaction
@@ -251,8 +254,7 @@ export default function Index({
                     break;
                 case "F2":
                     e.preventDefault();
-                    if (carts.length > 0 && selectedCustomer)
-                        handleSubmitTransaction();
+                    handleSubmitTransaction();
                     break;
                 case "F3":
                     e.preventDefault();
@@ -300,7 +302,11 @@ export default function Index({
             return;
         }
 
-        if (isCashPayment && cash < payable) {
+        const cashValue = isCashPayment
+            ? Math.max(0, Number(cashInputRef.current || cashInput) || 0)
+            : payable;
+
+        if (isCashPayment && cashValue < payable) {
             toast.error("Jumlah pembayaran kurang dari total");
             return;
         }
@@ -313,8 +319,8 @@ export default function Index({
                 customer_id: selectedCustomer?.id || null,
                 discount,
                 grand_total: payable,
-                cash: isCashPayment ? cash : payable,
-                change: isCashPayment ? Math.max(cash - payable, 0) : 0,
+                cash: isCashPayment ? cashValue : payable,
+                change: isCashPayment ? Math.max(cashValue - payable, 0) : 0,
                 payment_gateway: isCashPayment ? null : paymentMethod,
             },
             {
@@ -324,6 +330,7 @@ export default function Index({
                     setSelectedCustomer(null);
                     setPaymentMethod(defaultPaymentGateway ?? "cash");
                     setIsSubmitting(false);
+                    carts = [];
                     toast.success("Transaksi berhasil!");
                 },
                 onError: () => {
@@ -622,11 +629,13 @@ export default function Index({
                                             (amt) => (
                                                 <button
                                                     key={amt}
-                                                    onClick={() =>
-                                                        setCashInput(
-                                                            String(amt),
-                                                        )
-                                                    }
+                                                    onClick={() => {
+                                                        const nextValue =
+                                                            String(amt);
+                                                        cashInputRef.current =
+                                                            nextValue;
+                                                        setCashInput(nextValue);
+                                                    }}
                                                     className={`py-2 px-1 rounded-lg text-xs font-semibold transition-all ${
                                                         Number(cashInput) ===
                                                         amt
@@ -683,14 +692,16 @@ export default function Index({
                                             type="text"
                                             inputMode="numeric"
                                             value={cashInput}
-                                            onChange={(e) =>
-                                                setCashInput(
+                                            onChange={(e) => {
+                                                const nextValue =
                                                     e.target.value.replace(
                                                         /[^\d]/g,
                                                         "",
-                                                    ),
-                                                )
-                                            }
+                                                    );
+                                                cashInputRef.current =
+                                                    nextValue;
+                                                setCashInput(nextValue);
+                                            }}
                                             placeholder="0"
                                             className="w-full h-10 pl-10 pr-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-base font-semibold focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500"
                                         />

@@ -8,8 +8,6 @@ import Pagination from "@/Components/Dashboard/Pagination";
 export default function Index() {
     const { permissions } = usePage().props;
 
-    console.log(permissions);
-
     return (
         <>
             <Head title="Hak Akses" />

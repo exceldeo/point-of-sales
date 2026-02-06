@@ -472,21 +472,22 @@ class TransactionController extends Controller
                 ]);
             } catch (PaymentGatewayException $exception) {
                 return redirect()
-                    ->route('transactions.print', $transaction->invoice)
+                    ->route('transactions.print', [$transaction->invoice, 'backUrl' => route('transactions.index')])
                     ->with('error', $exception->getMessage());
             }
         }
 
-        return to_route('transactions.print', $transaction->invoice);
+        return to_route('transactions.print', [$transaction->invoice, 'backUrl' => route('transactions.index')]);
     }
 
-    public function print($invoice)
+    public function print($invoice, Request $request)
     {
         //get transaction
         $transaction = Transaction::with('details.product', 'cashier', 'customer')->where('invoice', $invoice)->firstOrFail();
 
         return Inertia::render('Dashboard/Transactions/Print', [
             'transaction' => $transaction,
+            'backUrl' => $request->input('backUrl') ?? route('transactions.index'),
         ]);
     }
 

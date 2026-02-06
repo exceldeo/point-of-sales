@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Head, Link } from "@inertiajs/react";
+import { Head, Link, router } from "@inertiajs/react";
 import {
     IconArrowLeft,
     IconPrinter,
@@ -11,7 +11,7 @@ import ThermalReceipt, {
     ThermalReceipt58mm,
 } from "@/Components/Receipt/ThermalReceipt";
 
-export default function Print({ transaction }) {
+export default function Print({ transaction, backUrl = null }) {
     const [printMode, setPrintMode] = useState("invoice"); // 'invoice' | 'thermal80' | 'thermal58'
 
     const formatPrice = (price = 0) =>
@@ -71,8 +71,14 @@ export default function Print({ transaction }) {
         window.print();
     };
 
-    const goBack = () => {
+    const goBack = (event) => {
         event.preventDefault();
+
+        if (backUrl) {
+            router.visit(backUrl);
+            return;
+        }
+
         window.history.back();
     };
 

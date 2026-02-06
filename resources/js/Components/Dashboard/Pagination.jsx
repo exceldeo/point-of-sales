@@ -9,7 +9,6 @@ export default function Pagination({ links }) {
         <>
             <ul className="mt-2 lg:mt-5 justify-end flex items-center gap-1">
                 {links.map((item, i) => {
-                    console.log("items", item.label.includes("previous"));
                     return item.url != null ? (
                         item.label.includes("previous") ? (
                             <Link className={style} key={i} href={item.url}>
