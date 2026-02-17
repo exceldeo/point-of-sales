@@ -21,6 +21,7 @@ import {
     IconUserSquare,
     IconUsers,
     IconUsersPlus,
+    IconArrowsRightLeft,
 } from "@tabler/icons-react";
 import hasAnyPermission from "./Permission";
 import React from "react";
@@ -67,6 +68,13 @@ export default function Menu() {
                     icon: <IconUsersPlus size={20} strokeWidth={1.5} />,
                     permissions: hasAnyPermission(["customers-access"]),
                 },
+                {
+                    title: "Pemasok",
+                    href: route("suppliers.index"),
+                    active: url === "/dashboard/suppliers" ? true : false, // Update comparison here
+                    icon: <IconUsersPlus size={20} strokeWidth={1.5} />,
+                    permissions: hasAnyPermission(["suppliers-access"]),
+                },
             ],
         },
         {
@@ -82,9 +90,19 @@ export default function Menu() {
                 {
                     title: "Riwayat Transaksi",
                     href: route("transactions.history"),
-                    active: url === "/dashboard/transactions/history" ? true : false,
+                    active:
+                        url === "/dashboard/transactions/history"
+                            ? true
+                            : false,
                     icon: <IconClockHour6 size={20} strokeWidth={1.5} />,
                     permissions: hasAnyPermission(["transactions-access"]),
+                },
+                {
+                    title: "Pembukuan Transaksi",
+                    href: route("reports.sales.index"),
+                    active: url.startsWith("/dashboard/reports/sales"),
+                    icon: <IconArrowsRightLeft size={20} strokeWidth={1.5} />,
+                    permissions: hasAnyPermission(["reports-access"]),
                 },
             ],
         },

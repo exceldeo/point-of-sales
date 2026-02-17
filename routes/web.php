@@ -4,6 +4,7 @@ use App\Http\Controllers\Apps\CategoryController;
 use App\Http\Controllers\Apps\CustomerController;
 use App\Http\Controllers\Apps\PaymentSettingController;
 use App\Http\Controllers\Apps\ProductController;
+use App\Http\Controllers\Apps\SupplierController;
 use App\Http\Controllers\Apps\TransactionController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PermissionController;
@@ -60,6 +61,11 @@ Route::group(['prefix' => 'dashboard', 'middleware' => ['auth']], function () {
         ->middlewareFor(['create', 'store'], 'permission:customers-create')
         ->middlewareFor(['edit', 'update'], 'permission:customers-edit')
         ->middlewareFor('destroy', 'permission:customers-delete');
+    Route::resource('suppliers', SupplierController::class)
+        ->middlewareFor(['index', 'show'], 'permission:suppliers-access')
+        ->middlewareFor(['create', 'store'], 'permission:suppliers-create')
+        ->middlewareFor(['edit', 'update'], 'permission:suppliers-edit')
+        ->middlewareFor('destroy', 'permission:suppliers-delete');
 
     //route customer history
     Route::get('/customers/{customer}/history', [CustomerController::class, 'getHistory'])->middleware('permission:transactions-access')->name('customers.history');

@@ -52,6 +52,12 @@ class PermissionSeeder extends Seeder
         Permission::create(['name' => 'customers-edit']);
         Permission::create(['name' => 'customers-delete']);
 
+        //permission suppliers
+        Permission::create(['name' => 'suppliers-access']);
+        Permission::create(['name' => 'suppliers-create']);
+        Permission::create(['name' => 'suppliers-edit']);
+        Permission::create(['name' => 'suppliers-delete']);
+
         //permission transactions
         Permission::create(['name' => 'transactions-access']);
 
