@@ -71,7 +71,7 @@ class PermissionSeeder extends Seeder
         Permission::create(['name' => 'reports-access']);
         Permission::create(['name' => 'profits-access']);
 
-        // payment settings
-        Permission::create(['name' => 'payment-settings-access']);
+        // settings
+        Permission::create(['name' => 'settings-access']);
     }
 }

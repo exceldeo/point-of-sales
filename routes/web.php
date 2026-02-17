@@ -6,6 +6,7 @@ use App\Http\Controllers\Apps\PaymentSettingController;
 use App\Http\Controllers\Apps\ProductController;
 use App\Http\Controllers\Apps\StockManagementController;
 use App\Http\Controllers\Apps\SupplierController;
+use App\Http\Controllers\Apps\StoreSettingController;
 use App\Http\Controllers\Apps\TransactionController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PermissionController;
@@ -119,8 +120,10 @@ Route::group(['prefix' => 'dashboard', 'middleware' => ['auth']], function () {
     Route::get('/transactions/{invoice}/print', [TransactionController::class, 'print'])->middleware('permission:transactions-access')->name('transactions.print');
     Route::get('/transactions/history', [TransactionController::class, 'history'])->middleware('permission:transactions-access')->name('transactions.history');
 
-    Route::get('/settings/payments', [PaymentSettingController::class, 'edit'])->middleware('permission:payment-settings-access')->name('settings.payments.edit');
-    Route::put('/settings/payments', [PaymentSettingController::class, 'update'])->middleware('permission:payment-settings-access')->name('settings.payments.update');
+    Route::get('/settings/payments', [PaymentSettingController::class, 'edit'])->middleware('permission:settings-access')->name('settings.payments.edit');
+    Route::put('/settings/payments', [PaymentSettingController::class, 'update'])->middleware('permission:settings-access')->name('settings.payments.update');
+    Route::get('/settings/store', [StoreSettingController::class, 'edit'])->middleware('permission:settings-access')->name('settings.store.edit');
+    Route::put('/settings/store', [StoreSettingController::class, 'update'])->middleware('permission:settings-access')->name('settings.store.update');
 
     //reports
     Route::get('/reports/sales', [SalesReportController::class, 'index'])->middleware('permission:reports-access')->name('reports.sales.index');

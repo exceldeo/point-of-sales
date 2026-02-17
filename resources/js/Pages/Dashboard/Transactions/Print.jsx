@@ -11,8 +11,12 @@ import ThermalReceipt, {
     ThermalReceipt58mm,
 } from "@/Components/Receipt/ThermalReceipt";
 
-export default function Print({ transaction, backUrl = null }) {
+export default function Print({ transaction, storeSetting, backUrl = null }) {
     const [printMode, setPrintMode] = useState("invoice"); // 'invoice' | 'thermal80' | 'thermal58'
+
+    const storeName = storeSetting?.store_name || "TOKO ANDA";
+    const storeAddress = storeSetting?.store_address || "";
+    const storePhone = storeSetting?.store_phone || "";
 
     const formatPrice = (price = 0) =>
         Number(price || 0).toLocaleString("id-ID", {
@@ -177,15 +181,16 @@ export default function Print({ transaction, backUrl = null }) {
                                 {printMode === "thermal80" ? (
                                     <ThermalReceipt
                                         transaction={transaction}
-                                        storeName="TOKO ANDA"
-                                        storeAddress="Jl. Contoh No. 123"
-                                        storePhone="08123456789"
+                                        storeName={storeName}
+                                        storeAddress={storeAddress}
+                                        storePhone={storePhone}
                                     />
                                 ) : (
                                     <ThermalReceipt58mm
                                         transaction={transaction}
-                                        storeName="TOKO"
-                                        storePhone="08123456789"
+                                        storeName={storeName}
+                                        storeAddress={storeAddress}
+                                        storePhone={storePhone}
                                     />
                                 )}
                             </div>
@@ -229,7 +234,7 @@ export default function Print({ transaction, backUrl = null }) {
                             </div>
 
                             {/* Info Grid */}
-                            <div className="grid md:grid-cols-2 gap-6 px-6 py-6 border-b border-slate-100 dark:border-slate-800">
+                            <div className="grid md:grid-cols-3 gap-6 px-6 py-6 border-b border-slate-100 dark:border-slate-800">
                                 <div>
                                     <p className="text-xs font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-2">
                                         Pelanggan
@@ -255,6 +260,24 @@ export default function Print({ transaction, backUrl = null }) {
                                     <p className="text-base font-semibold text-slate-900 dark:text-white">
                                         {transaction.cashier?.name ?? "-"}
                                     </p>
+                                </div>
+                                <div>
+                                    <p className="text-xs font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-2">
+                                        Toko
+                                    </p>
+                                    <p className="text-base font-semibold text-slate-900 dark:text-white">
+                                        {storeName}
+                                    </p>
+                                    {storeAddress && (
+                                        <p className="text-sm text-slate-600 dark:text-slate-400">
+                                            {storeAddress}
+                                        </p>
+                                    )}
+                                    {storePhone && (
+                                        <p className="text-sm text-slate-600 dark:text-slate-400">
+                                            {storePhone}
+                                        </p>
+                                    )}
                                 </div>
                             </div>
 

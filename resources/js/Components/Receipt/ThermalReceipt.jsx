@@ -180,6 +180,7 @@ export default function ThermalReceipt({
 export function ThermalReceipt58mm({
     transaction,
     storeName = "TOKO",
+    storeAddress = "",
     storePhone = "",
 }) {
     const formatPrice = (price = 0) => {
@@ -205,6 +206,7 @@ export function ThermalReceipt58mm({
         >
             <div className="text-center">
                 <p className="font-bold">{storeName}</p>
+                {storeAddress && <p>{storeAddress}</p>}
                 {storePhone && <p>{storePhone}</p>}
             </div>
 

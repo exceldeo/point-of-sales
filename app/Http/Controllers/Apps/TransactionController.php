@@ -7,6 +7,7 @@ use App\Models\Cart;
 use App\Models\Customer;
 use App\Models\PaymentSetting;
 use App\Models\Product;
+use App\Models\StoreSetting;
 use App\Models\Transaction;
 use App\Support\StockLogContext;
 use App\Services\Payments\PaymentGatewayManager;
@@ -491,9 +492,15 @@ class TransactionController extends Controller
     {
         //get transaction
         $transaction = Transaction::with('details.product', 'cashier', 'customer')->where('invoice', $invoice)->firstOrFail();
+        $storeSetting = StoreSetting::firstOrCreate([], [
+            'store_name' => 'TOKO ANDA',
+            'store_address' => null,
+            'store_phone' => null,
+        ]);
 
         return Inertia::render('Dashboard/Transactions/Print', [
             'transaction' => $transaction,
+            'storeSetting' => $storeSetting,
             'backUrl' => $request->input('backUrl') ?? route('transactions.index'),
         ]);
     }

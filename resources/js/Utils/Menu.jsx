@@ -23,6 +23,7 @@ import {
     IconUsers,
     IconUsersPlus,
     IconArrowsRightLeft,
+    IconBuildingStore,
 } from "@tabler/icons-react";
 import hasAnyPermission from "./Permission";
 import React from "react";
@@ -188,7 +189,14 @@ export default function Menu() {
                     href: route("settings.payments.edit"),
                     active: url === "/dashboard/settings/payments",
                     icon: <IconCreditCard size={20} strokeWidth={1.5} />,
-                    permissions: hasAnyPermission(["payment-settings-access"]),
+                    permissions: hasAnyPermission(["settings-access"]),
+                },
+                {
+                    title: "Store Setting",
+                    href: route("settings.store.edit"),
+                    active: url === "/dashboard/settings/store",
+                    icon: <IconBuildingStore size={20} strokeWidth={1.5} />,
+                    permissions: hasAnyPermission(["settings-access"]),
                 },
             ],
         },
