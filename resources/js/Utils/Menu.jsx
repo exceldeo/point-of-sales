@@ -1,5 +1,6 @@
 import { usePage } from "@inertiajs/react";
 import {
+    IconArrowsUpDown,
     IconBooks,
     IconBox,
     IconCategory,
@@ -98,11 +99,11 @@ export default function Menu() {
                     permissions: hasAnyPermission(["transactions-access"]),
                 },
                 {
-                    title: "Pembukuan Transaksi",
-                    href: route("reports.sales.index"),
-                    active: url.startsWith("/dashboard/reports/sales"),
-                    icon: <IconArrowsRightLeft size={20} strokeWidth={1.5} />,
-                    permissions: hasAnyPermission(["reports-access"]),
+                    title: "Stock Management",
+                    href: route("stock-management.index"),
+                    active: url === "/dashboard/stock-management",
+                    icon: <IconArrowsUpDown size={20} strokeWidth={1.5} />,
+                    permissions: hasAnyPermission(["stock-management-access"]),
                 },
             ],
         },
@@ -124,6 +125,13 @@ export default function Menu() {
                     active: url.startsWith("/dashboard/reports/profits"),
                     icon: <IconChartBarPopular size={20} strokeWidth={1.5} />,
                     permissions: hasAnyPermission(["profits-access"]),
+                },
+                {
+                    title: "Pembukuan Transaksi",
+                    href: route("reports.sales.index"),
+                    active: url.startsWith("/dashboard/reports/sales"),
+                    icon: <IconArrowsRightLeft size={20} strokeWidth={1.5} />,
+                    permissions: hasAnyPermission(["reports-access"]),
                 },
             ],
         },

@@ -35,6 +35,7 @@ class RoleSeeder extends Seeder
             'transactions-access',
             'customers-access',
             'customers-create',
+            'stock-management-access',
         ])->get();
         $cashierRole->givePermissionTo($cashierPermissions);
     }

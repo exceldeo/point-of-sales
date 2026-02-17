@@ -58,6 +58,12 @@ class PermissionSeeder extends Seeder
         Permission::create(['name' => 'suppliers-edit']);
         Permission::create(['name' => 'suppliers-delete']);
 
+        //permission stock management
+        Permission::create(['name' => 'stock-management-access']);
+        Permission::create(['name' => 'stock-management-create']);
+        Permission::create(['name' => 'stock-management-edit']);
+        Permission::create(['name' => 'stock-management-delete']);
+
         //permission transactions
         Permission::create(['name' => 'transactions-access']);
 

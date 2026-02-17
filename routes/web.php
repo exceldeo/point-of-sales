@@ -4,6 +4,7 @@ use App\Http\Controllers\Apps\CategoryController;
 use App\Http\Controllers\Apps\CustomerController;
 use App\Http\Controllers\Apps\PaymentSettingController;
 use App\Http\Controllers\Apps\ProductController;
+use App\Http\Controllers\Apps\StockManagementController;
 use App\Http\Controllers\Apps\SupplierController;
 use App\Http\Controllers\Apps\TransactionController;
 use App\Http\Controllers\DashboardController;
@@ -66,6 +67,25 @@ Route::group(['prefix' => 'dashboard', 'middleware' => ['auth']], function () {
         ->middlewareFor(['create', 'store'], 'permission:suppliers-create')
         ->middlewareFor(['edit', 'update'], 'permission:suppliers-edit')
         ->middlewareFor('destroy', 'permission:suppliers-delete');
+
+    Route::get('/stock-management', [StockManagementController::class, 'index'])
+        ->middleware('permission:stock-management-access')
+        ->name('stock-management.index');
+    Route::get('/stock-management/create', [StockManagementController::class, 'create'])
+        ->middleware('permission:stock-management-create')
+        ->name('stock-management.create');
+    Route::post('/stock-management', [StockManagementController::class, 'store'])
+        ->middleware('permission:stock-management-create')
+        ->name('stock-management.store');
+    Route::get('/stock-management/{stockTransaction}/edit', [StockManagementController::class, 'edit'])
+        ->middleware('permission:stock-management-edit')
+        ->name('stock-management.edit');
+    Route::put('/stock-management/{stockTransaction}', [StockManagementController::class, 'update'])
+        ->middleware('permission:stock-management-edit')
+        ->name('stock-management.update');
+    Route::delete('/stock-management/{stockTransaction}', [StockManagementController::class, 'destroy'])
+        ->middleware('permission:stock-management-delete')
+        ->name('stock-management.destroy');
 
     //route customer history
     Route::get('/customers/{customer}/history', [CustomerController::class, 'getHistory'])->middleware('permission:transactions-access')->name('customers.history');
