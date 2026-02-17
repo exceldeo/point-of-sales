@@ -29,6 +29,11 @@ class Product extends Model
         return $this->belongsTo(Category::class);
     }
 
+    public function stockLogs()
+    {
+        return $this->hasMany(LogStock::class);
+    }
+
     /**
      * image
      *

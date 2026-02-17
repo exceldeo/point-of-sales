@@ -6,6 +6,7 @@ use Inertia\Inertia;
 use App\Models\Product;
 use App\Models\Category;
 use Illuminate\Http\Request;
+use App\Support\StockLogContext;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Storage;
 
@@ -69,17 +70,23 @@ class ProductController extends Controller
         $image = $request->file('image');
         $image->storeAs('public/products', $image->hashName());
 
-        //create product
-        Product::create([
-            'image' => $image->hashName(),
-            'barcode' => $request->barcode,
-            'title' => $request->title,
-            'description' => $request->description,
-            'category_id' => $request->category_id,
-            'buy_price' => $request->buy_price,
-            'sell_price' => $request->sell_price,
-            'stock' => $request->stock,
-        ]);
+        StockLogContext::set(null, 'Stok awal produk saat produk dibuat');
+
+        try {
+            //create product
+            Product::create([
+                'image' => $image->hashName(),
+                'barcode' => $request->barcode,
+                'title' => $request->title,
+                'description' => $request->description,
+                'category_id' => $request->category_id,
+                'buy_price' => $request->buy_price,
+                'sell_price' => $request->sell_price,
+                'stock' => $request->stock,
+            ]);
+        } finally {
+            StockLogContext::clear();
+        }
 
         //redirect
         return to_route('products.index');
@@ -124,32 +131,7 @@ class ProductController extends Controller
             'stock' => 'required',
         ]);
 
-        //check image update
-        if ($request->file('image')) {
-
-            //remove old image
-            Storage::disk('local')->delete('public/products/' . basename($product->image));
-
-            //upload new image
-            $image = $request->file('image');
-            $image->storeAs('public/products', $image->hashName());
-
-            //update product with new image
-            $product->update([
-                'image' => $image->hashName(),
-                'barcode' => $request->barcode,
-                'title' => $request->title,
-                'description' => $request->description,
-                'category_id' => $request->category_id,
-                'buy_price' => $request->buy_price,
-                'sell_price' => $request->sell_price,
-                'stock' => $request->stock,
-            ]);
-
-        }
-
-        //update product without image
-        $product->update([
+        $payload = [
             'barcode' => $request->barcode,
             'title' => $request->title,
             'description' => $request->description,
@@ -157,7 +139,27 @@ class ProductController extends Controller
             'buy_price' => $request->buy_price,
             'sell_price' => $request->sell_price,
             'stock' => $request->stock,
-        ]);
+        ];
+
+        //check image update
+        if ($request->file('image')) {
+            //remove old image
+            Storage::disk('local')->delete('public/products/' . basename($product->image));
+
+            //upload new image
+            $image = $request->file('image');
+            $image->storeAs('public/products', $image->hashName());
+
+            $payload['image'] = $image->hashName();
+        }
+
+        StockLogContext::set($product, 'Penyesuaian stok dari perubahan data produk');
+
+        try {
+            $product->update($payload);
+        } finally {
+            StockLogContext::clear();
+        }
 
         //redirect
         return to_route('products.index');

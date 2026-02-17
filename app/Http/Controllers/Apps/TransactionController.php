@@ -8,6 +8,7 @@ use App\Models\Customer;
 use App\Models\PaymentSetting;
 use App\Models\Product;
 use App\Models\Transaction;
+use App\Support\StockLogContext;
 use App\Services\Payments\PaymentGatewayManager;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
@@ -435,26 +436,32 @@ class TransactionController extends Controller
 
             $carts = Cart::where('cashier_id', auth()->user()->id)->get();
 
-            foreach ($carts as $cart) {
-                $transaction->details()->create([
-                    'transaction_id' => $transaction->id,
-                    'product_id'     => $cart->product_id,
-                    'qty'            => $cart->qty,
-                    'price'          => $cart->price,
-                ]);
+            StockLogContext::set($transaction, 'Pengurangan stok dari transaksi ' . $transaction->invoice);
 
-                $total_buy_price  = $cart->product->buy_price * $cart->qty;
-                $total_sell_price = $cart->product->sell_price * $cart->qty;
-                $profits          = $total_sell_price - $total_buy_price;
+            try {
+                foreach ($carts as $cart) {
+                    $transaction->details()->create([
+                        'transaction_id' => $transaction->id,
+                        'product_id'     => $cart->product_id,
+                        'qty'            => $cart->qty,
+                        'price'          => $cart->price,
+                    ]);
 
-                $transaction->profits()->create([
-                    'transaction_id' => $transaction->id,
-                    'total'          => $profits,
-                ]);
+                    $total_buy_price  = $cart->product->buy_price * $cart->qty;
+                    $total_sell_price = $cart->product->sell_price * $cart->qty;
+                    $profits          = $total_sell_price - $total_buy_price;
 
-                $product        = Product::find($cart->product_id);
-                $product->stock = $product->stock - $cart->qty;
-                $product->save();
+                    $transaction->profits()->create([
+                        'transaction_id' => $transaction->id,
+                        'total'          => $profits,
+                    ]);
+
+                    $product        = Product::find($cart->product_id);
+                    $product->stock = $product->stock - $cart->qty;
+                    $product->save();
+                }
+            } finally {
+                StockLogContext::clear();
             }
 
             Cart::where('cashier_id', auth()->user()->id)->delete();
