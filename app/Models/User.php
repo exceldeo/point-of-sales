@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\EmployeeRole;
 use App\Models\StockTransaction;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;

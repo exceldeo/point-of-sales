@@ -9,6 +9,7 @@ use App\Http\Controllers\Apps\SupplierController;
 use App\Http\Controllers\Apps\StoreSettingController;
 use App\Http\Controllers\Apps\TransactionController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\EmployeeManagementController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Reports\ProfitReportController;
@@ -47,6 +48,12 @@ Route::group(['prefix' => 'dashboard', 'middleware' => ['auth']], function () {
         ->middlewareFor(['create', 'store'], 'permission:users-create')
         ->middlewareFor(['edit', 'update'], 'permission:users-update')
         ->middlewareFor('destroy', 'permission:users-delete');
+    Route::get('/employees', [EmployeeManagementController::class, 'index'])
+        ->middleware('permission:employee-access')
+        ->name('employees.index');
+    Route::put('/employees/permission-group', [EmployeeManagementController::class, 'updatePermissionGroup'])
+        ->middleware('permission:employee-access')
+        ->name('employees.permission-group.update');
 
     Route::resource('categories', CategoryController::class)
         ->middlewareFor(['index', 'show'], 'permission:categories-access')

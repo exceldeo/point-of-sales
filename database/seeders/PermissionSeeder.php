@@ -73,5 +73,9 @@ class PermissionSeeder extends Seeder
 
         // settings
         Permission::create(['name' => 'settings-access']);
+
+        // employee management
+        Permission::create(['name' => 'employee-access']);
+        Permission::create(['name' => 'employee-edit']);
     }
 }

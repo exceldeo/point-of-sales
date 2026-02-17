@@ -24,6 +24,7 @@ import {
     IconUsersPlus,
     IconArrowsRightLeft,
     IconBuildingStore,
+    IconBriefcase,
 } from "@tabler/icons-react";
 import hasAnyPermission from "./Permission";
 import React from "react";
@@ -176,6 +177,13 @@ export default function Menu() {
                                     ? true
                                     : false,
                             permissions: hasAnyPermission(["users-create"]),
+                        },
+                        {
+                            title: "Data Karyawan",
+                            href: route("employees.index"),
+                            active: url === "/dashboard/employees",
+                            icon: <IconBriefcase size={20} strokeWidth={1.5} />,
+                            permissions: hasAnyPermission(["employee-access"]),
                         },
                     ],
                 },
