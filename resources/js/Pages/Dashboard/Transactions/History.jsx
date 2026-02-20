@@ -20,6 +20,8 @@ const defaultFilters = {
     invoice: "",
     start_date: "",
     end_date: "",
+    cashier_id: "",
+    user_id: "",
 };
 
 const formatCurrency = (value = 0) =>
@@ -29,7 +31,12 @@ const formatCurrency = (value = 0) =>
         minimumFractionDigits: 0,
     }).format(value);
 
-const History = ({ transactions, filters }) => {
+const History = ({
+    transactions,
+    filters,
+    cashiers = [],
+    handledUsers = [],
+}) => {
     const [filterData, setFilterData] = useState({
         ...defaultFilters,
         ...filters,
@@ -76,7 +83,11 @@ const History = ({ transactions, filters }) => {
         : rows.length || 1;
 
     const hasActiveFilters =
-        filterData.invoice || filterData.start_date || filterData.end_date;
+        filterData.invoice ||
+        filterData.start_date ||
+        filterData.end_date ||
+        filterData.cashier_id ||
+        filterData.user_id;
 
     return (
         <>
@@ -126,57 +137,111 @@ const History = ({ transactions, filters }) => {
                 {showFilters && (
                     <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 animate-slide-up">
                         <form onSubmit={applyFilters}>
-                            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-                                <div>
-                                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                                        Nomor Invoice
-                                    </label>
-                                    <input
-                                        type="text"
-                                        placeholder="TRX-..."
-                                        value={filterData.invoice}
-                                        onChange={(e) =>
-                                            handleChange(
-                                                "invoice",
-                                                e.target.value,
-                                            )
-                                        }
-                                        className="w-full h-11 px-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-200 placeholder-slate-400 focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all"
-                                    />
+                            <div className="space-y-4">
+                                <div className="grid gap-4 md:grid-cols-3">
+                                    <div>
+                                        <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                                            Nomor Invoice
+                                        </label>
+                                        <input
+                                            type="text"
+                                            placeholder="TRX-..."
+                                            value={filterData.invoice}
+                                            onChange={(e) =>
+                                                handleChange(
+                                                    "invoice",
+                                                    e.target.value,
+                                                )
+                                            }
+                                            className="w-full h-11 px-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-200 placeholder-slate-400 focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                                            Tanggal Mulai
+                                        </label>
+                                        <input
+                                            type="date"
+                                            value={filterData.start_date}
+                                            onChange={(e) =>
+                                                handleChange(
+                                                    "start_date",
+                                                    e.target.value,
+                                                )
+                                            }
+                                            className="w-full h-11 px-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-200 focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                                            Tanggal Akhir
+                                        </label>
+                                        <input
+                                            type="date"
+                                            value={filterData.end_date}
+                                            onChange={(e) =>
+                                                handleChange(
+                                                    "end_date",
+                                                    e.target.value,
+                                                )
+                                            }
+                                            className="w-full h-11 px-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-200 focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                                            Kasir
+                                        </label>
+                                        <select
+                                            value={filterData.cashier_id}
+                                            onChange={(e) =>
+                                                handleChange(
+                                                    "cashier_id",
+                                                    e.target.value,
+                                                )
+                                            }
+                                            className="w-full h-11 px-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-200 focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all"
+                                        >
+                                            <option value="">
+                                                Semua kasir
+                                            </option>
+                                            {cashiers.map((cashier) => (
+                                                <option
+                                                    key={cashier.id}
+                                                    value={cashier.id}
+                                                >
+                                                    {cashier.name}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                                            Handle Oleh
+                                        </label>
+                                        <select
+                                            value={filterData.user_id}
+                                            onChange={(e) =>
+                                                handleChange(
+                                                    "user_id",
+                                                    e.target.value,
+                                                )
+                                            }
+                                            className="w-full h-11 px-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-200 focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all"
+                                        >
+                                            <option value="">Semua user</option>
+                                            {handledUsers.map((user) => (
+                                                <option
+                                                    key={user.id}
+                                                    value={user.id}
+                                                >
+                                                    {user.name}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </div>
                                 </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                                        Tanggal Mulai
-                                    </label>
-                                    <input
-                                        type="date"
-                                        value={filterData.start_date}
-                                        onChange={(e) =>
-                                            handleChange(
-                                                "start_date",
-                                                e.target.value,
-                                            )
-                                        }
-                                        className="w-full h-11 px-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-200 focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all"
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                                        Tanggal Akhir
-                                    </label>
-                                    <input
-                                        type="date"
-                                        value={filterData.end_date}
-                                        onChange={(e) =>
-                                            handleChange(
-                                                "end_date",
-                                                e.target.value,
-                                            )
-                                        }
-                                        className="w-full h-11 px-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-200 focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all"
-                                    />
-                                </div>
-                                <div className="flex items-end gap-2">
+                                <div className="flex items-end gap-2 w-full">
                                     <button
                                         type="submit"
                                         className="flex-1 h-11 inline-flex items-center justify-center gap-2 rounded-xl bg-primary-500 hover:bg-primary-600 text-white font-medium transition-colors"
@@ -219,6 +284,9 @@ const History = ({ transactions, filters }) => {
                                             Kasir
                                         </th>
                                         <th className="px-4 py-4 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                                            Handle Oleh
+                                        </th>
+                                        <th className="px-4 py-4 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
                                             Pelanggan
                                         </th>
                                         <th className="px-4 py-4 text-center text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
@@ -259,6 +327,9 @@ const History = ({ transactions, filters }) => {
                                             <td className="px-4 py-4 text-sm text-slate-600 dark:text-slate-400">
                                                 {transaction.cashier?.name ??
                                                     "-"}
+                                            </td>
+                                            <td className="px-4 py-4 text-sm text-slate-600 dark:text-slate-400">
+                                                {transaction.user?.name ?? "-"}
                                             </td>
                                             <td className="px-4 py-4">
                                                 <span className="px-2 py-1 text-xs font-medium bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 rounded-md">

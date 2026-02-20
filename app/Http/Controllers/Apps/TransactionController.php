@@ -564,10 +564,12 @@ class TransactionController extends Controller
             'invoice'    => $request->input('invoice'),
             'start_date' => $request->input('start_date'),
             'end_date'   => $request->input('end_date'),
+            'cashier_id' => $request->input('cashier_id'),
+            'user_id'    => $request->input('user_id'),
         ];
 
         $query = Transaction::query()
-            ->with(['cashier:id,name', 'customer:id,name'])
+            ->with(['cashier:id,name', 'customer:id,name', 'user:id,name'])
             ->withSum('details as total_items', 'qty')
             ->withSum('profits as total_profit', 'total')
             ->orderByDesc('created_at');
@@ -580,6 +582,12 @@ class TransactionController extends Controller
             ->when($filters['invoice'], function (Builder $builder, $invoice) {
                 $builder->where('invoice', 'like', '%' . $invoice . '%');
             })
+            ->when($filters['cashier_id'], function (Builder $builder, $cashierId) {
+                $builder->where('cashier_id', $cashierId);
+            })
+            ->when($filters['user_id'], function (Builder $builder, $userId) {
+                $builder->where('user_id', $userId);
+            })
             ->when($filters['start_date'], function (Builder $builder, $date) {
                 $builder->whereDate('created_at', '>=', $date);
             })
@@ -589,9 +597,24 @@ class TransactionController extends Controller
 
         $transactions = $query->paginate(10)->withQueryString();
 
+        $cashiers = User::query()
+            ->select('id', 'name')
+            ->when(! $request->user()->isSuperAdmin(), function (Builder $builder) use ($request) {
+                $builder->where('id', $request->user()->id);
+            })
+            ->orderBy('name')
+            ->get();
+
+        $handledUsers = User::query()
+            ->select('id', 'name')
+            ->orderBy('name')
+            ->get();
+
         return Inertia::render('Dashboard/Transactions/History', [
             'transactions' => $transactions,
             'filters'      => $filters,
+            'cashiers'     => $cashiers,
+            'handledUsers' => $handledUsers,
         ]);
     }
 }
