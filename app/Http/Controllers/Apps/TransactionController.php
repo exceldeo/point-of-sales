@@ -1,6 +1,7 @@
 <?php
 namespace App\Http\Controllers\Apps;
 
+use App\Enums\PaymentMethodEnums;
 use App\Exceptions\PaymentGatewayException;
 use App\Http\Controllers\Controller;
 use App\Models\Cart;
@@ -89,6 +90,7 @@ class TransactionController extends Controller
         $defaultGateway = $paymentSetting?->default_gateway ?? 'cash';
         if (
             $defaultGateway !== 'cash'
+            && $defaultGateway !== 'qrcode'
             && (! $paymentSetting || ! $paymentSetting->isGatewayReady($defaultGateway))
         ) {
             $defaultGateway = 'cash';
@@ -103,6 +105,7 @@ class TransactionController extends Controller
             'products'              => $products,
             'categories'            => $categories,
             'paymentGateways'       => $paymentSetting?->enabledGateways() ?? [],
+            'paymentMethods' => PaymentMethodEnums::options(),
             'defaultPaymentGateway' => $defaultGateway,
         ]);
     }
@@ -406,8 +409,8 @@ class TransactionController extends Controller
             $paymentGateway = strtolower($paymentGateway);
         }
         $paymentSetting = null;
-
-        if ($paymentGateway) {
+        
+        if ($paymentGateway && !in_array($paymentGateway, array_column(PaymentMethodEnums::options(), 'value'))) {
             $paymentSetting = PaymentSetting::first();
 
             if (! $paymentSetting || ! $paymentSetting->isGatewayReady($paymentGateway)) {
@@ -426,6 +429,7 @@ class TransactionController extends Controller
         $invoice       = 'TRX-' . Str::upper($random);
         $isCashPayment = empty($paymentGateway);
         $cashAmount    = $isCashPayment ? $request->cash : $request->grand_total;
+        $isQrCodePayment = $paymentGateway === 'qrcode';
         $changeAmount  = $isCashPayment ? $request->change : 0;
 
         $transaction = DB::transaction(function () use (
@@ -434,7 +438,8 @@ class TransactionController extends Controller
             $cashAmount,
             $changeAmount,
             $paymentGateway,
-            $isCashPayment
+            $isCashPayment,
+            $isQrCodePayment,
         ) {
             $transaction = Transaction::create([
                 'cashier_id'     => auth()->user()->id,
@@ -446,7 +451,7 @@ class TransactionController extends Controller
                 'discount'       => $request->discount,
                 'grand_total'    => $request->grand_total,
                 'payment_method' => $paymentGateway ?: 'cash',
-                'payment_status' => $isCashPayment ? 'paid' : 'pending',
+                'payment_status' => $isCashPayment || $isQrCodePayment ? 'paid' : 'pending',
             ]);
 
             $carts = Cart::where('cashier_id', auth()->user()->id)->get();
@@ -517,7 +522,7 @@ class TransactionController extends Controller
             return $transaction->fresh(['customer']);
         });
 
-        if ($paymentGateway) {
+        if ($paymentGateway && !in_array($paymentGateway, array_column(PaymentMethodEnums::options(), 'value'))) {
             try {
                 $paymentResponse = $paymentGatewayManager->createPayment($transaction, $paymentGateway, $paymentSetting);
 
@@ -563,6 +568,7 @@ class TransactionController extends Controller
             'end_date'   => $request->input('end_date'),
             'cashier_id' => $request->input('cashier_id'),
             'user_id'    => $request->input('user_id'),
+            'payment_method' => $request->input('payment_method'),
         ];
 
         $query = Transaction::query()
@@ -590,6 +596,9 @@ class TransactionController extends Controller
             })
             ->when($filters['end_date'], function (Builder $builder, $date) {
                 $builder->whereDate('created_at', '<=', $date);
+            })
+            ->when($filters['payment_method'], function (Builder $builder, $paymentMethod) {
+                $builder->where('payment_method', $paymentMethod);
             });
 
         $transactions = $query->paginate(10)->withQueryString();
@@ -606,12 +615,22 @@ class TransactionController extends Controller
             ->select('id', 'name')
             ->orderBy('name')
             ->get();
+        $paymentMethods = PaymentMethodEnums::options();
+        
+        $paymentMethods = 
+            array_map(function ($method) {
+                return [
+                    'value' => $method['value'],
+                    'label' => $method['label'],
+                ];
+             }, PaymentMethodEnums::options());
 
         return Inertia::render('Dashboard/Transactions/History', [
             'transactions' => $transactions,
             'filters'      => $filters,
             'cashiers'     => $cashiers,
             'handledUsers' => $handledUsers,
+            'paymentMethods' => $paymentMethods,
         ]);
     }
 }

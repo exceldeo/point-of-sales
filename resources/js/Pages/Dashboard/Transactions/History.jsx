@@ -36,6 +36,7 @@ const History = ({
     filters,
     cashiers = [],
     handledUsers = [],
+    paymentMethods = [],
 }) => {
     const [filterData, setFilterData] = useState({
         ...defaultFilters,
@@ -289,6 +290,9 @@ const History = ({
                                         <th className="px-4 py-4 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
                                             Pelanggan
                                         </th>
+                                        <th className="px-4 py-4 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                                            Payment Method
+                                        </th>
                                         <th className="px-4 py-4 text-center text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
                                             Item
                                         </th>
@@ -335,6 +339,15 @@ const History = ({
                                                 <span className="px-2 py-1 text-xs font-medium bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 rounded-md">
                                                     {transaction.customer
                                                         ?.name ?? "Umum"}
+                                                </span>
+                                            </td>
+                                            <td className="px-4 py-4 text-sm text-slate-600 dark:text-slate-400">
+                                                <span className="px-2 py-1 text-xs font-medium bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 rounded-md">
+                                                    {paymentMethods.find(
+                                                        (method) =>
+                                                            method.value ===
+                                                            transaction.payment_method,
+                                                    )?.label ?? "-"}
                                                 </span>
                                             </td>
                                             <td className="px-4 py-4 text-center">

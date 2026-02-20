@@ -38,6 +38,7 @@ export default function Print({ transaction, storeSetting, backUrl = null }) {
 
     const paymentLabels = {
         cash: "Tunai",
+        qrcode: "QR Code",
         midtrans: "Midtrans",
         xendit: "Xendit",
     };

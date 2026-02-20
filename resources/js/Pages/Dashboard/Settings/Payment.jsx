@@ -38,6 +38,7 @@ export default function Payment({ setting, supportedGateways = [] }) {
 
     const isGatewaySelectable = (gateway) => {
         if (gateway === "cash") return true;
+        if (gateway === "qrcode") return true;
         if (gateway === "midtrans") return data.midtrans_enabled;
         if (gateway === "xendit") return data.xendit_enabled;
         return false;
@@ -118,7 +119,7 @@ export default function Payment({ setting, supportedGateways = [] }) {
                                 onChange={(e) =>
                                     setData(
                                         "midtrans_enabled",
-                                        e.target.checked
+                                        e.target.checked,
                                     )
                                 }
                             />
@@ -140,7 +141,7 @@ export default function Payment({ setting, supportedGateways = [] }) {
                                 onChange={(e) =>
                                     setData(
                                         "midtrans_server_key",
-                                        e.target.value
+                                        e.target.value,
                                     )
                                 }
                                 errors={errors?.midtrans_server_key}
@@ -153,7 +154,7 @@ export default function Payment({ setting, supportedGateways = [] }) {
                                 onChange={(e) =>
                                     setData(
                                         "midtrans_client_key",
-                                        e.target.value
+                                        e.target.value,
                                     )
                                 }
                                 errors={errors?.midtrans_client_key}
@@ -166,7 +167,7 @@ export default function Payment({ setting, supportedGateways = [] }) {
                                 onChange={(e) =>
                                     setData(
                                         "midtrans_production",
-                                        e.target.checked
+                                        e.target.checked,
                                     )
                                 }
                             />
@@ -235,7 +236,7 @@ export default function Payment({ setting, supportedGateways = [] }) {
                                 onChange={(e) =>
                                     setData(
                                         "xendit_production",
-                                        e.target.checked
+                                        e.target.checked,
                                     )
                                 }
                             />

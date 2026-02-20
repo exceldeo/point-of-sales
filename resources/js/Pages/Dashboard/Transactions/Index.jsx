@@ -28,6 +28,7 @@ import {
     IconTrash,
     IconCash,
     IconCreditCard,
+    IconQrcode,
 } from "@tabler/icons-react";
 
 const formatPrice = (value = 0) =>
@@ -46,6 +47,7 @@ export default function Index({
     products = [],
     categories = [],
     paymentGateways = [],
+    paymentMethods = [],
     defaultPaymentGateway = "cash",
 }) {
     const { auth, errors } = usePage().props;
@@ -132,14 +134,7 @@ export default function Index({
               )
             : [];
 
-        return [
-            {
-                value: "cash",
-                label: "Tunai",
-                description: "Pembayaran tunai langsung di kasir.",
-            },
-            ...options,
-        ];
+        return [...paymentMethods, ...options];
     }, [paymentGateways]);
 
     // Auto-set cash input for non-cash payment
@@ -628,6 +623,9 @@ export default function Index({
                                             >
                                                 {method.value === "cash" ? (
                                                     <IconCash size={16} />
+                                                ) : method.value ===
+                                                  "qrcode" ? (
+                                                    <IconQrcode size={16} />
                                                 ) : (
                                                     <IconCreditCard size={16} />
                                                 )}

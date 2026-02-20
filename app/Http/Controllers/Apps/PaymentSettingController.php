@@ -7,6 +7,7 @@ use App\Models\PaymentSetting;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
+use App\Enums\PaymentMethodEnums;
 
 class PaymentSettingController extends Controller
 {
@@ -16,10 +17,12 @@ class PaymentSettingController extends Controller
             'default_gateway' => 'cash',
         ]);
 
+        $paymentMethods = PaymentMethodEnums::options();
+
         return Inertia::render('Dashboard/Settings/Payment', [
             'setting' => $setting,
             'supportedGateways' => [
-                ['value' => 'cash', 'label' => 'Tunai'],
+                ...$paymentMethods,
                 ['value' => PaymentSetting::GATEWAY_MIDTRANS, 'label' => 'Midtrans'],
                 ['value' => PaymentSetting::GATEWAY_XENDIT, 'label' => 'Xendit'],
             ],
@@ -35,7 +38,7 @@ class PaymentSettingController extends Controller
         $data = $request->validate([
             'default_gateway' => [
                 'required',
-                Rule::in(['cash', PaymentSetting::GATEWAY_MIDTRANS, PaymentSetting::GATEWAY_XENDIT]),
+                Rule::in([...PaymentMethodEnums::getAllOptionsValues(), PaymentSetting::GATEWAY_MIDTRANS, PaymentSetting::GATEWAY_XENDIT]),
             ],
             'midtrans_enabled' => ['boolean'],
             'midtrans_server_key' => ['nullable', 'string'],
@@ -64,6 +67,7 @@ class PaymentSettingController extends Controller
 
         if (
             $data['default_gateway'] !== 'cash'
+            && $data['default_gateway'] !== 'qrcode'
             && !(($data['default_gateway'] === PaymentSetting::GATEWAY_MIDTRANS && $midtransEnabled)
                 || ($data['default_gateway'] === PaymentSetting::GATEWAY_XENDIT && $xenditEnabled))
         ) {
