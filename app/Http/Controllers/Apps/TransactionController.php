@@ -348,10 +348,7 @@ class TransactionController extends Controller
             ], 404);
         }
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Transaksi ditahan berhasil dihapus',
-        ]);
+        return back()->with('success', 'Transaksi ditahan dihapus');
     }
 
     /**
