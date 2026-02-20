@@ -4,6 +4,7 @@ import { Head, useForm, usePage, Link } from "@inertiajs/react";
 import Input from "@/Components/Dashboard/Input";
 import Textarea from "@/Components/Dashboard/TextArea";
 import InputSelect from "@/Components/Dashboard/InputSelect";
+import ProductCommissionFields from "@/Components/Dashboard/ProductCommissionFields";
 import toast from "react-hot-toast";
 import {
     IconPackage,
@@ -15,8 +16,16 @@ import {
 } from "@tabler/icons-react";
 import { getProductImageUrl } from "@/Utils/imageUrl";
 
-export default function Edit({ categories, product }) {
+export default function Edit({ categories, product, employees }) {
     const { errors } = usePage().props;
+
+    const initialCommissions = (product.commission_users || []).map(
+        (commissionUser) => ({
+            user_id: String(commissionUser.id),
+            type: commissionUser.pivot?.type || "percentage",
+            value: String(commissionUser.pivot?.value ?? ""),
+        }),
+    );
 
     const { data, setData, post, processing } = useForm({
         image: "",
@@ -27,18 +36,19 @@ export default function Edit({ categories, product }) {
         buy_price: product.buy_price,
         sell_price: product.sell_price,
         stock: product.stock,
+        commissions: initialCommissions,
         _method: "PUT",
     });
 
     const [selectedCategory, setSelectedCategory] = useState(null);
     const [imagePreview, setImagePreview] = useState(
-        product.image ? getProductImageUrl(product.image) : null
+        product.image ? getProductImageUrl(product.image) : null,
     );
 
     useEffect(() => {
         if (product.category_id) {
             setSelectedCategory(
-                categories.find((cat) => cat.id === product.category_id)
+                categories.find((cat) => cat.id === product.category_id),
             );
         }
     }, [product.category_id]);
@@ -169,7 +179,7 @@ export default function Edit({ categories, product }) {
                                         onChange={(e) =>
                                             setData(
                                                 "description",
-                                                e.target.value
+                                                e.target.value,
                                             )
                                         }
                                         value={data.description}
@@ -217,6 +227,15 @@ export default function Edit({ categories, product }) {
                                 />
                             </div>
                         </div>
+                    </div>
+
+                    <div className="lg:col-span-3 space-y-6">
+                        <ProductCommissionFields
+                            users={employees}
+                            commissions={data.commissions}
+                            setData={setData}
+                            errors={errors}
+                        />
 
                         <div className="flex justify-end gap-3">
                             <Link

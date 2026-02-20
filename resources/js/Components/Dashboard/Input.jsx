@@ -1,6 +1,14 @@
 import React from "react";
 
-export default function Input({ label, type, className, errors, ...props }) {
+export default function Input({
+    label,
+    type,
+    className,
+    errors,
+    prefix,
+    suffix,
+    ...props
+}) {
     return (
         <div className="flex flex-col gap-2">
             {label && (
@@ -8,25 +16,41 @@ export default function Input({ label, type, className, errors, ...props }) {
                     {label}
                 </label>
             )}
-            <input
-                type={type}
-                className={`
-                    w-full h-11 px-4 text-sm rounded-xl
-                    border border-slate-200 dark:border-slate-700
-                    bg-slate-50 dark:bg-slate-800
-                    text-slate-800 dark:text-slate-200
-                    placeholder-slate-400 dark:placeholder-slate-500
-                    focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500
-                    transition-all duration-200
-                    ${
-                        errors
-                            ? "border-danger-500 focus:border-danger-500 focus:ring-danger-500/20"
-                            : ""
-                    }
-                    ${className || ""}
-                `}
-                {...props}
-            />
+            <div className="relative">
+                {prefix && (
+                    <div className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 dark:text-slate-400 pointer-events-none">
+                        {prefix}
+                    </div>
+                )}
+
+                <input
+                    type={type}
+                    className={`
+                        w-full h-11 px-4 text-sm rounded-xl
+                        border border-slate-200 dark:border-slate-700
+                        bg-slate-50 dark:bg-slate-800
+                        text-slate-800 dark:text-slate-200
+                        placeholder-slate-400 dark:placeholder-slate-500
+                        focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500
+                        transition-all duration-200
+                        ${prefix ? "pl-10" : ""}
+                        ${suffix ? "pr-10" : ""}
+                        ${
+                            errors
+                                ? "border-danger-500 focus:border-danger-500 focus:ring-danger-500/20"
+                                : ""
+                        }
+                        ${className || ""}
+                    `}
+                    {...props}
+                />
+
+                {suffix && (
+                    <div className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 dark:text-slate-400 pointer-events-none">
+                        {suffix}
+                    </div>
+                )}
+            </div>
             {errors && (
                 <small className="text-xs text-danger-500 dark:text-danger-400">
                     {errors}

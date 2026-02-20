@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import DashboardLayout from "@/Layouts/DashboardLayout";
 import { Head, useForm, usePage, Link } from "@inertiajs/react";
-import Button from "@/Components/Dashboard/Button";
 import Input from "@/Components/Dashboard/Input";
 import Textarea from "@/Components/Dashboard/TextArea";
 import InputSelect from "@/Components/Dashboard/InputSelect";
+import ProductCommissionFields from "@/Components/Dashboard/ProductCommissionFields";
 import toast from "react-hot-toast";
 import {
     IconPackage,
@@ -15,7 +15,7 @@ import {
     IconCurrencyDollar,
 } from "@tabler/icons-react";
 
-export default function Create({ categories }) {
+export default function Create({ categories, employees }) {
     const { errors } = usePage().props;
 
     const { data, setData, post, processing } = useForm({
@@ -27,6 +27,7 @@ export default function Create({ categories }) {
         buy_price: "",
         sell_price: "",
         stock: "",
+        commissions: [],
     });
 
     const [selectedCategory, setSelectedCategory] = useState(null);
@@ -159,7 +160,7 @@ export default function Create({ categories }) {
                                         onChange={(e) =>
                                             setData(
                                                 "description",
-                                                e.target.value
+                                                e.target.value,
                                             )
                                         }
                                         value={data.description}
@@ -208,6 +209,15 @@ export default function Create({ categories }) {
                                 />
                             </div>
                         </div>
+                    </div>
+
+                    <div className="lg:col-span-3 space-y-6">
+                        <ProductCommissionFields
+                            users={employees}
+                            commissions={data.commissions}
+                            setData={setData}
+                            errors={errors}
+                        />
 
                         {/* Submit */}
                         <div className="flex justify-end gap-3">

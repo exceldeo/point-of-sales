@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Models\StockTransactionItem;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
@@ -38,6 +39,13 @@ class Product extends Model
     public function stockTransactionItems()
     {
         return $this->hasMany(StockTransactionItem::class);
+    }
+
+    public function commissionUsers(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'product_user_commissions')
+            ->withPivot(['type', 'value'])
+            ->withTimestamps();
     }
 
     /**

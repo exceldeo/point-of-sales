@@ -5,10 +5,12 @@ namespace App\Http\Controllers\Apps;
 use Inertia\Inertia;
 use App\Models\Product;
 use App\Models\Category;
+use App\Models\User;
 use Illuminate\Http\Request;
 use App\Support\StockLogContext;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Storage;
+use App\Http\Controllers\EmployeeManagementController;
 
 class ProductController extends Controller
 {
@@ -39,10 +41,16 @@ class ProductController extends Controller
     {
         //get categories
         $categories = Category::all();
+        $users = User::query()
+            ->select('id', 'name', 'email')
+            ->orderBy('name')
+            ->get();
+        $employees = (new EmployeeManagementController())->getEmployees();
 
         //return inertia
         return Inertia::render('Dashboard/Products/Create', [
-            'categories' => $categories
+            'categories' => $categories,
+            'employees' => $employees,
         ]);
     }
 
@@ -65,6 +73,10 @@ class ProductController extends Controller
             'buy_price' => 'required',
             'sell_price' => 'required',
             'stock' => 'required',
+            'commissions' => 'nullable|array',
+            'commissions.*.user_id' => 'required|integer|distinct|exists:users,id',
+            'commissions.*.type' => 'required|in:percentage,nominal',
+            'commissions.*.value' => 'required|numeric|min:0',
         ]);
         //upload image
         $image = $request->file('image');
@@ -74,7 +86,7 @@ class ProductController extends Controller
 
         try {
             //create product
-            Product::create([
+            $product = Product::create([
                 'image' => $image->hashName(),
                 'barcode' => $request->barcode,
                 'title' => $request->title,
@@ -84,6 +96,8 @@ class ProductController extends Controller
                 'sell_price' => $request->sell_price,
                 'stock' => $request->stock,
             ]);
+
+            $product->commissionUsers()->sync($this->commissionSyncPayload($request->input('commissions', [])));
         } finally {
             StockLogContext::clear();
         }
@@ -102,10 +116,19 @@ class ProductController extends Controller
     {
         //get categories
         $categories = Category::all();
+        $users = User::query()
+            ->select('id', 'name', 'email')
+            ->orderBy('name')
+            ->get();
+
+        $product->load(['commissionUsers' => fn($query) => $query->select('users.id', 'name', 'email')]);
+
+        $employees = (new EmployeeManagementController())->getEmployees();
 
         return Inertia::render('Dashboard/Products/Edit', [
             'product' => $product,
-            'categories' => $categories
+            'categories' => $categories,
+            'employees' => $employees,
         ]);
     }
 
@@ -129,6 +152,10 @@ class ProductController extends Controller
             'buy_price' => 'required',
             'sell_price' => 'required',
             'stock' => 'required',
+            'commissions' => 'nullable|array',
+            'commissions.*.user_id' => 'required|integer|distinct|exists:users,id',
+            'commissions.*.type' => 'required|in:percentage,nominal',
+            'commissions.*.value' => 'required|numeric|min:0',
         ]);
 
         $payload = [
@@ -157,6 +184,7 @@ class ProductController extends Controller
 
         try {
             $product->update($payload);
+            $product->commissionUsers()->sync($this->commissionSyncPayload($request->input('commissions', [])));
         } finally {
             StockLogContext::clear();
         }
@@ -184,5 +212,18 @@ class ProductController extends Controller
 
         //redirect
         return back();
+    }
+
+    private function commissionSyncPayload(array $commissions): array
+    {
+        return collect($commissions)
+            ->filter(fn($commission) => isset($commission['user_id'], $commission['type'], $commission['value']))
+            ->mapWithKeys(fn($commission) => [
+                (int) $commission['user_id'] => [
+                    'type' => $commission['type'],
+                    'value' => (float) $commission['value'],
+                ],
+            ])
+            ->toArray();
     }
 }

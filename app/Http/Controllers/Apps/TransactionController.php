@@ -18,6 +18,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
+use App\Http\Controllers\EmployeeManagementController;
 
 class TransactionController extends Controller
 {
@@ -63,14 +64,7 @@ class TransactionController extends Controller
             ->with('permissionGroup')
             ->select('id', 'permission_group_id')
             ->get();
-        $employees = User::query()->with('roles:id,name')
-            ->whereHas('roles', function ($query) use ($employeeRoles) {
-                $query->whereIn('id', $employeeRoles->pluck('permission_group_id'));
-            })
-            ->select('id', 'name', 'email')
-            ->get();
-
-
+        $employees = (new EmployeeManagementController())->getEmployees();
 
         // get all products with categories for product grid
         $products = Product::with('category:id,name')

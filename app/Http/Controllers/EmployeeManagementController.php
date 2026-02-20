@@ -67,4 +67,28 @@ class EmployeeManagementController extends Controller
 
         return back();
     }
+
+    public function getEmployees($keyword = null)
+    {
+        $employeeRoles = EmployeeRole::query()
+            ->with('permissionGroup')
+            ->select('id', 'permission_group_id')
+            ->get();
+
+        $employees = User::query()->with('roles:id,name')
+            ->whereHas('roles', function ($query) use ($employeeRoles) {
+                $query->whereIn('id', $employeeRoles->pluck('permission_group_id'));
+            })
+            ->when($keyword, function ($query, $keyword) {
+                $query->where(function ($q) use ($keyword) {
+                    $q->where('name', 'like', '%' . $keyword . '%')
+                        ->orWhere('email', 'like', '%' . $keyword . '%');
+                });
+            })
+            ->select('id', 'name', 'email')
+            ->latest()
+            ->get();
+
+        return $employees;
+    }
 }
