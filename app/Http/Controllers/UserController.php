@@ -20,6 +20,7 @@ class UserController extends Controller
         $users = User::query()
             ->with('roles')
             ->when(request()->search, fn($query) => $query->where('name', 'like', '%' . request()->search . '%'))
+            ->with('logCommissions:id,user_id,nominal')
             ->select('id', 'name', 'avatar', 'email')
             ->latest()
             ->paginate(7)

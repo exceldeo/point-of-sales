@@ -19,6 +19,13 @@ import Checkbox from "@/Components/Dashboard/Checkbox";
 import Pagination from "@/Components/Dashboard/Pagination";
 import Swal from "sweetalert2";
 
+const formatCurrency = (value = 0) =>
+    new Intl.NumberFormat("id-ID", {
+        style: "currency",
+        currency: "IDR",
+        minimumFractionDigits: 0,
+    }).format(value);
+
 // User Card for Grid View
 function UserCard({ user, isSelected, onSelect, onDelete }) {
     return (
@@ -54,6 +61,20 @@ function UserCard({ user, isSelected, onSelect, onDelete }) {
                     onChange={onSelect}
                     checked={isSelected}
                 />
+            </div>
+
+            <div className="px-4 pb-4">
+                <p className="text-sm text-slate-500 dark:text-slate-400 mb-2">
+                    Total Komisi
+                </p>
+                <p className="text-lg font-bold text-primary-600 dark:text-primary-400">
+                    {formatCurrency(
+                        user.log_commissions.reduce(
+                            (sum, item) => sum + item.nominal,
+                            0,
+                        ),
+                    )}
+                </p>
             </div>
 
             {/* Roles */}
@@ -95,7 +116,7 @@ function UserCard({ user, isSelected, onSelect, onDelete }) {
 
 export default function Index() {
     const { users } = usePage().props;
-    const [viewMode, setViewMode] = useState("grid");
+    const [viewMode, setViewMode] = useState("list");
 
     const {
         data,
@@ -223,7 +244,7 @@ export default function Index() {
                                 key={user.id}
                                 user={user}
                                 isSelected={data.selectedUser.includes(
-                                    user.id.toString()
+                                    user.id.toString(),
                                 )}
                                 onSelect={setSelectedUser}
                                 onDelete={deleteData}
@@ -240,13 +261,13 @@ export default function Index() {
                                             onChange={(e) => {
                                                 const allUserIds =
                                                     users.data.map((user) =>
-                                                        user.id.toString()
+                                                        user.id.toString(),
                                                     );
                                                 setData(
                                                     "selectedUser",
                                                     e.target.checked
                                                         ? allUserIds
-                                                        : []
+                                                        : [],
                                                 );
                                             }}
                                             checked={
@@ -257,6 +278,7 @@ export default function Index() {
                                     </Table.Th>
                                     <Table.Th className={"w-10"}>No</Table.Th>
                                     <Table.Th>Pengguna</Table.Th>
+                                    <Table.Th>Total Komisi</Table.Th>
                                     <Table.Th>Group Akses</Table.Th>
                                     <Table.Th></Table.Th>
                                 </tr>
@@ -272,7 +294,7 @@ export default function Index() {
                                                 value={user.id}
                                                 onChange={setSelectedUser}
                                                 checked={data.selectedUser.includes(
-                                                    user.id.toString()
+                                                    user.id.toString(),
                                                 )}
                                             />
                                         </Table.Td>
@@ -299,6 +321,17 @@ export default function Index() {
                                             </div>
                                         </Table.Td>
                                         <Table.Td>
+                                            <span className="font-medium text-primary-600 dark:text-primary-400">
+                                                {formatCurrency(
+                                                    user.log_commissions.reduce(
+                                                        (sum, item) =>
+                                                            sum + item.nominal,
+                                                        0,
+                                                    ),
+                                                )}
+                                            </span>
+                                        </Table.Td>
+                                        <Table.Td>
                                             <div className="flex flex-wrap gap-1">
                                                 {user.roles.map(
                                                     (role, index) => (
@@ -308,7 +341,7 @@ export default function Index() {
                                                         >
                                                             {role.name}
                                                         </span>
-                                                    )
+                                                    ),
                                                 )}
                                             </div>
                                         </Table.Td>
@@ -327,7 +360,7 @@ export default function Index() {
                                                     }
                                                     href={route(
                                                         "users.edit",
-                                                        user.id
+                                                        user.id,
                                                     )}
                                                 />
                                                 <Button
@@ -343,7 +376,7 @@ export default function Index() {
                                                     }
                                                     url={route(
                                                         "users.destroy",
-                                                        user.id
+                                                        user.id,
                                                     )}
                                                 />
                                             </div>
