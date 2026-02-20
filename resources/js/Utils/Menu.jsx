@@ -25,6 +25,7 @@ import {
     IconArrowsRightLeft,
     IconBuildingStore,
     IconBriefcase,
+    IconUserCircle,
 } from "@tabler/icons-react";
 import hasAnyPermission from "./Permission";
 import React from "react";
@@ -205,6 +206,13 @@ export default function Menu() {
                     active: url === "/dashboard/settings/store",
                     icon: <IconBuildingStore size={20} strokeWidth={1.5} />,
                     permissions: hasAnyPermission(["settings-access"]),
+                },
+                {
+                    title: "Profile",
+                    href: route("profile.edit"),
+                    active: url === "/dashboard/profile",
+                    icon: <IconUserCircle size={20} strokeWidth={1.5} />,
+                    permissions: true,
                 },
             ],
         },

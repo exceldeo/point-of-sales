@@ -6,6 +6,7 @@ use App\Models\EmployeeRole;
 use App\Models\StockTransaction;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -79,6 +80,16 @@ class User extends Authenticatable
         return $this->belongsToMany(Product::class, 'product_user_commissions')
             ->withPivot(['type', 'value'])
             ->withTimestamps();
+    }
+
+    public function logCommissions(): HasMany
+    {
+        return $this->hasMany(LogCommission::class);
+    }
+
+    public function totalCommission()
+    {
+        return $this->logCommissions()->sum('nominal');
     }
 
 }

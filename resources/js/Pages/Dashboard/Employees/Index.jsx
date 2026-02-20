@@ -17,6 +17,13 @@ import Button from "@/Components/Dashboard/Button";
 import hasAnyPermission from "@/Utils/Permission";
 import Modal from "@/Components/Dashboard/Modal";
 
+const formatCurrency = (value = 0) =>
+    new Intl.NumberFormat("id-ID", {
+        style: "currency",
+        currency: "IDR",
+        minimumFractionDigits: 0,
+    }).format(value);
+
 export default function Index({
     employees,
     filters,
@@ -156,12 +163,14 @@ export default function Index({
                                 <Table.Th className="w-10">No</Table.Th>
                                 <Table.Th>Nama</Table.Th>
                                 <Table.Th>Email</Table.Th>
+                                <Table.Th>Total Komisi</Table.Th>
                                 <Table.Th className="w-40"></Table.Th>
                             </tr>
                         </Table.Thead>
                         <Table.Tbody>
                             {employees.data.map((employee, i) => (
                                 <tr key={employee.id}>
+                                    {console.log(employee)}
                                     <Table.Td className="text-center">
                                         {++i +
                                             (employees.current_page - 1) *
@@ -173,6 +182,17 @@ export default function Index({
                                         </span>
                                     </Table.Td>
                                     <Table.Td>{employee.email}</Table.Td>
+                                    <Table.Td>
+                                        <span className="font-medium text-primary-600 dark:text-primary-400">
+                                            {formatCurrency(
+                                                employee.log_commissions.reduce(
+                                                    (sum, item) =>
+                                                        sum + item.nominal,
+                                                    0,
+                                                ),
+                                            )}
+                                        </span>
+                                    </Table.Td>
                                 </tr>
                             ))}
                         </Table.Tbody>

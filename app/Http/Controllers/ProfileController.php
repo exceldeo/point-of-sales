@@ -18,9 +18,24 @@ class ProfileController extends Controller
      */
     public function edit(Request $request): Response
     {
+        $commissionLogsQuery = $request->user()->logCommissions()->latest();
+
         return Inertia::render('Profile/Edit', [
             'mustVerifyEmail' => $request->user() instanceof MustVerifyEmail,
             'status' => session('status'),
+            'commissions' => [
+                'total_nominal' => (int) $commissionLogsQuery->sum('nominal'),
+                'items' => $commissionLogsQuery
+                    ->limit(20)
+                    ->get(['id', 'nominal', 'description', 'created_at'])
+                    ->map(fn($commission) => [
+                        'id' => $commission->id,
+                        'nominal' => (int) $commission->nominal,
+                        'description' => $commission->description,
+                        'created_at' => optional($commission->created_at)->format('d M Y H:i'),
+                    ])
+                    ->values(),
+            ],
         ]);
     }
 

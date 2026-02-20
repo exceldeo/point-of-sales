@@ -32,6 +32,7 @@ class EmployeeManagementController extends Controller
                         ->orWhere('email', 'like', '%' . $search . '%');
                 });
             })
+            ->with('logCommissions:id,user_id,nominal')
             ->select('id', 'name', 'email')
             ->latest()
             ->paginate(20);
@@ -76,6 +77,7 @@ class EmployeeManagementController extends Controller
             ->get();
 
         $employees = User::query()->with('roles:id,name')
+            ->withSum('logCommissions as total_commission', 'nominal')
             ->whereHas('roles', function ($query) use ($employeeRoles) {
                 $query->whereIn('id', $employeeRoles->pluck('permission_group_id'));
             })
