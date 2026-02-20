@@ -42,6 +42,7 @@ export default function Index({
     carts_total = 0,
     heldCarts = [],
     customers = [],
+    employees = [],
     products = [],
     categories = [],
     paymentGateways = [],
@@ -56,6 +57,7 @@ export default function Index({
     const [addingProductId, setAddingProductId] = useState(null);
     const [removingItemId, setRemovingItemId] = useState(null);
     const [selectedCustomer, setSelectedCustomer] = useState(null);
+    const [selectedUserId, setSelectedUserId] = useState("");
     const [discountInput, setDiscountInput] = useState("");
     const [cashInput, setCashInput] = useState("");
     const [paymentMethod, setPaymentMethod] = useState(
@@ -317,6 +319,7 @@ export default function Index({
             route("transactions.store"),
             {
                 customer_id: selectedCustomer?.id || null,
+                user_id: selectedUserId ? Number(selectedUserId) : null,
                 discount,
                 grand_total: payable,
                 cash: isCashPayment ? cashValue : payable,
@@ -328,6 +331,7 @@ export default function Index({
                     setDiscountInput("");
                     setCashInput("");
                     setSelectedCustomer(null);
+                    setSelectedUserId("");
                     setPaymentMethod(defaultPaymentGateway ?? "cash");
                     setIsSubmitting(false);
                     carts = [];
@@ -433,6 +437,32 @@ export default function Index({
                             error={errors?.customer_id}
                             label="Pelanggan"
                         />
+
+                        <div className="mt-3">
+                            <label className="flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                                <IconUser size={14} />
+                                Assign User (Opsional)
+                            </label>
+                            <select
+                                value={selectedUserId}
+                                onChange={(e) =>
+                                    setSelectedUserId(e.target.value)
+                                }
+                                className="w-full h-10 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 text-sm text-slate-700 dark:text-slate-200 focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500"
+                            >
+                                <option value="">Tidak dipilih</option>
+                                {employees.map((user) => (
+                                    <option key={user.id} value={user.id}>
+                                        {user.name}
+                                    </option>
+                                ))}
+                            </select>
+                            {errors?.user_id && (
+                                <p className="mt-1 text-xs text-danger-500">
+                                    {errors.user_id}
+                                </p>
+                            )}
+                        </div>
                     </div>
 
                     {/* Held Transactions - Show if any */}

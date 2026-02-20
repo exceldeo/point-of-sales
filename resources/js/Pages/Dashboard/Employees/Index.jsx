@@ -83,12 +83,12 @@ export default function Index({
                         <Button
                             type={"button"}
                             icon={
-                                <IconCirclePlus size={18} strokeWidth={1.5} />
+                                <IconPencilCheck size={18} strokeWidth={1.5} />
                             }
                             className={
                                 "bg-primary-500 hover:bg-primary-600 text-white shadow-lg shadow-primary-500/30"
                             }
-                            label={"Tambah Role Karyawan"}
+                            label={"Ubah Role Karyawan"}
                             onClick={() => setData("isOpen", true)}
                         />
                     )}
@@ -148,7 +148,7 @@ export default function Index({
                 </div>
             </div>
 
-            {employees.data.length > 0 ? (
+            {employees.data?.length > 0 ? (
                 <Table.Card title={"Data Karyawan"}>
                     <Table>
                         <Table.Thead>

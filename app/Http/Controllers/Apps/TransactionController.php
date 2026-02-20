@@ -9,6 +9,8 @@ use App\Models\PaymentSetting;
 use App\Models\Product;
 use App\Models\StoreSetting;
 use App\Models\Transaction;
+use App\Models\User;
+use App\Models\EmployeeRole;
 use App\Support\StockLogContext;
 use App\Services\Payments\PaymentGatewayManager;
 use Illuminate\Database\Eloquent\Builder;
@@ -56,6 +58,20 @@ class TransactionController extends Controller
         //get all customers
         $customers = Customer::latest()->get();
 
+        // get users for optional assignment
+        $employeeRoles = EmployeeRole::query()
+            ->with('permissionGroup')
+            ->select('id', 'permission_group_id')
+            ->get();
+        $employees = User::query()->with('roles:id,name')
+            ->whereHas('roles', function ($query) use ($employeeRoles) {
+                $query->whereIn('id', $employeeRoles->pluck('permission_group_id'));
+            })
+            ->select('id', 'name', 'email')
+            ->get();
+
+
+
         // get all products with categories for product grid
         $products = Product::with('category:id,name')
             ->select('id', 'barcode', 'title', 'description', 'image', 'buy_price', 'sell_price', 'stock', 'category_id')
@@ -88,6 +104,7 @@ class TransactionController extends Controller
             'carts_total'           => $carts_total,
             'heldCarts'             => $heldCarts,
             'customers'             => $customers,
+            'employees'             => $employees,
             'products'              => $products,
             'categories'            => $categories,
             'paymentGateways'       => $paymentSetting?->enabledGateways() ?? [],
@@ -388,6 +405,10 @@ class TransactionController extends Controller
      */
     public function store(Request $request, PaymentGatewayManager $paymentGatewayManager)
     {
+        $request->validate([
+            'user_id' => 'nullable|exists:users,id',
+        ]);
+
         $paymentGateway = $request->input('payment_gateway');
         if ($paymentGateway) {
             $paymentGateway = strtolower($paymentGateway);
@@ -425,6 +446,7 @@ class TransactionController extends Controller
         ) {
             $transaction = Transaction::create([
                 'cashier_id'     => auth()->user()->id,
+                'user_id'        => $request->user_id ?: null,
                 'customer_id'    => $request->customer_id ?: null,
                 'invoice'        => $invoice,
                 'cash'           => $cashAmount,

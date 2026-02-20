@@ -15,9 +15,17 @@ class UserRequest extends FormRequest
      */
     public function rules(): array
     {
+        $editableUser = $this->route('user');
+
+        $emailUniqueRule = Rule::unique(User::class, 'email');
+
+        if ($editableUser instanceof User) {
+            $emailUniqueRule->ignore($editableUser->id);
+        }
+
         return [
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', Rule::unique(User::class)->ignore($this->user()->id)],
+            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', $emailUniqueRule],
             'password' => ['nullable', 'string', 'min:8', 'confirmed'],
             
         ];

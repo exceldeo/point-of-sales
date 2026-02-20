@@ -18,6 +18,7 @@ class Transaction extends Model
      */
     protected $fillable = [
         'cashier_id',
+        'user_id',
         'customer_id',
         'invoice',
         'cash',
@@ -58,6 +59,16 @@ class Transaction extends Model
     public function cashier()
     {
         return $this->belongsTo(User::class, 'cashier_id');
+    }
+
+    /**
+     * user
+     *
+     * @return void
+     */
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id');
     }
 
     /**
