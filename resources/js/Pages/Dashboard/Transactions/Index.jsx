@@ -476,7 +476,8 @@ export default function Index({
                     {/* Cart Items - Scrollable */}
                     <div className="flex-1 overflow-y-auto min-h-0">
                         {/* Hold Button - at top of cart section */}
-                        {carts.length > 0 && (
+                        {/* TODO: Add hold button here, only show if carts.length > 0 and move held transactions component here as well, above the cart items list */}
+                        {/* {carts.length > 0 && (
                             <div className="p-3 border-b border-slate-200 dark:border-slate-800">
                                 <HoldButton
                                     hasItems={carts.length > 0}
@@ -484,7 +485,7 @@ export default function Index({
                                     isHolding={isHolding}
                                 />
                             </div>
-                        )}
+                        )} */}
 
                         <div className="p-3 border-b border-slate-200 dark:border-slate-800">
                             <div className="flex items-center justify-between mb-3">
