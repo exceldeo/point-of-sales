@@ -5,6 +5,7 @@ use App\Exceptions\PaymentGatewayException;
 use App\Http\Controllers\Controller;
 use App\Models\Cart;
 use App\Models\Customer;
+use App\Models\LogCommission;
 use App\Models\PaymentSetting;
 use App\Models\Product;
 use App\Models\StoreSetting;
@@ -452,6 +453,18 @@ class TransactionController extends Controller
             ]);
 
             $carts = Cart::where('cashier_id', auth()->user()->id)->get();
+            $assignedUserId = $request->user_id ?: null;
+            $totalCommission = 0;
+
+            $commissionSettingsByProduct = collect();
+            if ($assignedUserId && $carts->isNotEmpty()) {
+                $commissionSettingsByProduct = DB::table('product_user_commissions')
+                    ->select('product_id', 'type', 'value')
+                    ->where('user_id', $assignedUserId)
+                    ->whereIn('product_id', $carts->pluck('product_id')->unique()->values())
+                    ->get()
+                    ->keyBy('product_id');
+            }
 
             StockLogContext::set($transaction, 'Pengurangan stok dari transaksi ' . $transaction->invoice);
 
@@ -476,6 +489,27 @@ class TransactionController extends Controller
                     $product        = Product::find($cart->product_id);
                     $product->stock = $product->stock - $cart->qty;
                     $product->save();
+
+                    if ($assignedUserId) {
+                        $commissionSetting = $commissionSettingsByProduct->get($cart->product_id);
+                        if ($commissionSetting) {
+                            if ($commissionSetting->type === 'percentage') {
+                                $totalCommission += (int) round(($cart->price * (float) $commissionSetting->value) / 100);
+                            }
+
+                            if ($commissionSetting->type === 'nominal') {
+                                $totalCommission += (int) round(((float) $commissionSetting->value) * $cart->qty);
+                            }
+                        }
+                    }
+                }
+
+                if ($assignedUserId && $totalCommission > 0) {
+                    LogCommission::create([
+                        'user_id' => $assignedUserId,
+                        'nominal' => $totalCommission,
+                        'description' => 'Komisi dari invoice ' . $transaction->invoice,
+                    ]);
                 }
             } finally {
                 StockLogContext::clear();
