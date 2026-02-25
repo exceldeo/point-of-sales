@@ -15,6 +15,7 @@ import {
 import Search from "@/Components/Common/Search";
 import Table from "@/Components/Common/Table";
 import Pagination from "@/Components/Common/Pagination";
+import hasAnyPermission, { permissionEnums } from "@/Utils/Permission";
 
 // Category Card for Grid View
 function CategoryCard({ category }) {
@@ -41,20 +42,24 @@ function CategoryCard({ category }) {
 
                 {/* Action Buttons Overlay */}
                 <div className="absolute inset-0 bg-slate-900/0 group-hover:bg-slate-900/40 transition-all flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100">
-                    <Link
-                        href={route("categories.edit", category.id)}
-                        className="p-2.5 rounded-xl bg-white text-warning-600 hover:bg-warning-50 shadow-lg transition-colors"
-                    >
-                        <IconPencilCog size={18} />
-                    </Link>
-                    <Button
-                        type={"delete"}
-                        icon={<IconTrash size={18} />}
-                        className={
-                            "p-2.5 rounded-xl bg-white text-danger-600 hover:bg-danger-50 shadow-lg"
-                        }
-                        url={route("categories.destroy", category.id)}
-                    />
+                    {hasAnyPermission([permissionEnums.CATEGORIES_EDIT]) && (
+                        <Link
+                            href={route("categories.edit", category.id)}
+                            className="p-2.5 rounded-xl bg-white text-warning-600 hover:bg-warning-50 shadow-lg transition-colors"
+                        >
+                            <IconPencilCog size={18} />
+                        </Link>
+                    )}
+                    {hasAnyPermission([permissionEnums.CATEGORIES_DELETE]) && (
+                        <Button
+                            type={"delete"}
+                            icon={<IconTrash size={18} />}
+                            className={
+                                "p-2.5 rounded-xl bg-white text-danger-600 hover:bg-danger-50 shadow-lg"
+                            }
+                            url={route("categories.destroy", category.id)}
+                        />
+                    )}
                 </div>
             </div>
 
@@ -93,15 +98,19 @@ export default function Index({ categories }) {
                             kategori terdaftar
                         </p>
                     </div>
-                    <Button
-                        type={"link"}
-                        icon={<IconCirclePlus size={18} strokeWidth={1.5} />}
-                        className={
-                            "bg-primary-500 hover:bg-primary-600 text-white shadow-lg shadow-primary-500/30"
-                        }
-                        label={"Tambah Kategori"}
-                        href={route("categories.create")}
-                    />
+                    {hasAnyPermission([permissionEnums.CATEGORIES_CREATE]) && (
+                        <Button
+                            type={"link"}
+                            icon={
+                                <IconCirclePlus size={18} strokeWidth={1.5} />
+                            }
+                            className={
+                                "bg-primary-500 hover:bg-primary-600 text-white shadow-lg shadow-primary-500/30"
+                            }
+                            label={"Tambah Kategori"}
+                            href={route("categories.create")}
+                        />
+                    )}
                 </div>
             </div>
 
@@ -217,7 +226,7 @@ export default function Index({ categories }) {
                                                     }
                                                     href={route(
                                                         "categories.edit",
-                                                        category.id
+                                                        category.id,
                                                     )}
                                                 />
                                                 <Button
@@ -233,7 +242,7 @@ export default function Index({ categories }) {
                                                     }
                                                     url={route(
                                                         "categories.destroy",
-                                                        category.id
+                                                        category.id,
                                                     )}
                                                 />
                                             </div>
