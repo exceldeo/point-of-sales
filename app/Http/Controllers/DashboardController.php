@@ -98,4 +98,9 @@ class DashboardController extends Controller
             'topCustomers'      => $topCustomers,
         ]);
     }
+
+    public function home()
+    {
+        return Inertia::render('Home/Index');
+    }
 }

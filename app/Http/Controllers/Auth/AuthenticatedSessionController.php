@@ -34,11 +34,7 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        if (Auth::user()->hasRole('kasir')) {
-            return redirect()->intended(route('transactions.index', false));
-        }
-
-        return redirect()->intended(route('dashboard', false));
+        return redirect()->intended(route('home', false));
     }
 
     /**

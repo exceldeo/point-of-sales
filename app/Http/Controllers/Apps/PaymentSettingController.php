@@ -19,7 +19,7 @@ class PaymentSettingController extends Controller
 
         $paymentMethods = PaymentMethodEnums::options();
 
-        return Inertia::render('Dashboard/Settings/Payment', [
+        return Inertia::render('Settings/Payment', [
             'setting' => $setting,
             'supportedGateways' => [
                 ...$paymentMethods,

@@ -30,14 +30,14 @@ class StockManagementController extends Controller
             ->paginate(10)
             ->withQueryString();
 
-        return Inertia::render('Dashboard/StockManagement/Index', [
+        return Inertia::render('StockManagement/Index', [
             'transactions' => $transactions,
         ]);
     }
 
     public function create()
     {
-        return Inertia::render('Dashboard/StockManagement/Create', [
+        return Inertia::render('StockManagement/Create', [
             'suppliers' => Supplier::query()->select('id', 'name')->orderBy('name')->get(),
             'products' => Product::query()->select('id', 'title', 'stock')->orderBy('title')->get(),
         ]);
@@ -89,7 +89,7 @@ class StockManagementController extends Controller
     {
         $stockTransaction->load(['items']);
 
-        return Inertia::render('Dashboard/StockManagement/Edit', [
+        return Inertia::render('StockManagement/Edit', [
             'transaction' => $stockTransaction,
             'suppliers' => Supplier::query()->select('id', 'name')->orderBy('name')->get(),
             'products' => Product::query()->select('id', 'title', 'stock')->orderBy('title')->get(),

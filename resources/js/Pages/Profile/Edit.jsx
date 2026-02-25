@@ -1,4 +1,4 @@
-import DashboardLayout from "@/Layouts/DashboardLayout";
+import AppLayout from "@/Layouts/AppLayout";
 import DeleteUserForm from "./Partials/DeleteUserForm";
 import UpdatePasswordForm from "./Partials/UpdatePasswordForm";
 import UpdateProfileInformationForm from "./Partials/UpdateProfileInformationForm";
@@ -102,4 +102,4 @@ export default function Edit({ mustVerifyEmail, status, commissions }) {
     );
 }
 
-Edit.layout = (page) => <DashboardLayout children={page} />;
+Edit.layout = (page) => <AppLayout children={page} />;

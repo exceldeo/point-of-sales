@@ -19,122 +19,120 @@ use App\Http\Controllers\UserController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+use App\Enums\PermissionEnums;
 
 Route::get('/', function () {
     if (auth()->check()){
-        if(auth()->user()->hasRole('cashier')){
-            return redirect()->route('transactions.index');
-        }
-        
-        return redirect()->route('dashboard');
+        return redirect()->route('home');
     }
     return redirect()->route('login');
 });
 
-Route::group(['prefix' => 'dashboard', 'middleware' => ['auth']], function () {
-    Route::get('/', [DashboardController::class, 'index'])->middleware(['auth', 'verified', 'permission:dashboard-access'])->name('dashboard');
-    Route::get('/permissions', [PermissionController::class, 'index'])->middleware('permission:permissions-access')->name('permissions.index');
+Route::group(['prefix' => '', 'middleware' => ['auth']], function () {
+    Route::get('/', [DashboardController::class, 'home'])->name('home');
+    Route::get('/dashboard', [DashboardController::class, 'index'])->middleware(['auth', 'verified', 'permission:'.PermissionEnums::DASHBOARD_ACCESS->value])->name('dashboard');
+    Route::get('/permissions', [PermissionController::class, 'index'])->middleware('permission:'.PermissionEnums::PERMISSIONS_ACCESS->value)->name('permissions.index');
     // roles route
     Route::resource('/roles', RoleController::class)
         ->except(['create', 'edit', 'show'])
-        ->middlewareFor('index', 'permission:roles-access')
-        ->middlewareFor('store', 'permission:roles-create')
-        ->middlewareFor('update', 'permission:roles-update')
-        ->middlewareFor('destroy', 'permission:roles-delete');
+        ->middlewareFor('index', 'permission:'.PermissionEnums::ROLES_ACCESS->value)
+        ->middlewareFor('store', 'permission:'.PermissionEnums::ROLES_CREATE->value)
+        ->middlewareFor('update', 'permission:'.PermissionEnums::ROLES_UPDATE->value)
+        ->middlewareFor('destroy', 'permission:'.PermissionEnums::ROLES_DELETE->value);
     // users route
     Route::resource('/users', UserController::class)
         ->except('show')
-        ->middlewareFor('index', 'permission:users-access')
-        ->middlewareFor(['create', 'store'], 'permission:users-create')
-        ->middlewareFor(['edit', 'update'], 'permission:users-update')
-        ->middlewareFor('destroy', 'permission:users-delete');
-    Route::get('/employees', [EmployeeManagementController::class, 'index'])
-        ->middleware('permission:employee-access')
-        ->name('employees.index');
+        ->middlewareFor('index', 'permission:'.PermissionEnums::USERS_ACCESS->value)
+        ->middlewareFor(['create', 'store'], 'permission:'.PermissionEnums::USERS_CREATE->value)
+        ->middlewareFor(['edit', 'update'], 'permission:'.PermissionEnums::USERS_UPDATE->value)
+        ->middlewareFor('destroy', 'permission:'.PermissionEnums::USERS_DELETE->value);
+    Route::get('/employees-management', [EmployeeManagementController::class, 'index'])
+        ->middleware('permission:'.PermissionEnums::EMPLOYEE_MANAGEMENT_ACCESS->value)
+        ->name('employee-management.index');
     Route::put('/employees/permission-group', [EmployeeManagementController::class, 'updatePermissionGroup'])
-        ->middleware('permission:employee-access')
-        ->name('employees.permission-group.update');
+        ->middleware('permission:'.PermissionEnums::EMPLOYEE_MANAGEMENT_CHANGE->value)
+        ->name('employee-management.permission-group.update');
 
     Route::resource('categories', CategoryController::class)
-        ->middlewareFor(['index', 'show'], 'permission:categories-access')
-        ->middlewareFor(['create', 'store'], 'permission:categories-create')
-        ->middlewareFor(['edit', 'update'], 'permission:categories-edit')
-        ->middlewareFor('destroy', 'permission:categories-delete');
+        ->middlewareFor(['index', 'show'], 'permission:'.PermissionEnums::CATEGORIES_ACCESS->value)
+        ->middlewareFor(['create', 'store'], 'permission:'.PermissionEnums::CATEGORIES_CREATE->value)
+        ->middlewareFor(['edit', 'update'], 'permission:'.PermissionEnums::CATEGORIES_EDIT->value)
+        ->middlewareFor('destroy', 'permission:'.PermissionEnums::CATEGORIES_DELETE->value);
     Route::resource('products', ProductController::class)
-        ->middlewareFor(['index', 'show'], 'permission:products-access')
-        ->middlewareFor(['create', 'store'], 'permission:products-create')
-        ->middlewareFor(['edit', 'update'], 'permission:products-edit')
-        ->middlewareFor('destroy', 'permission:products-delete');
+        ->middlewareFor(['index', 'show'], 'permission:'.PermissionEnums::PRODUCTS_ACCESS->value)
+        ->middlewareFor(['create', 'store'], 'permission:'.PermissionEnums::PRODUCTS_CREATE->value)
+        ->middlewareFor(['edit', 'update'], 'permission:'.PermissionEnums::PRODUCTS_EDIT->value)
+        ->middlewareFor('destroy', 'permission:'.PermissionEnums::PRODUCTS_DELETE->value);
     Route::resource('customers', CustomerController::class)
-        ->middlewareFor(['index', 'show'], 'permission:customers-access')
-        ->middlewareFor(['create', 'store'], 'permission:customers-create')
-        ->middlewareFor(['edit', 'update'], 'permission:customers-edit')
-        ->middlewareFor('destroy', 'permission:customers-delete');
+        ->middlewareFor(['index', 'show'], 'permission:'.PermissionEnums::CUSTOMERS_ACCESS->value)
+        ->middlewareFor(['create', 'store'], 'permission:'.PermissionEnums::CUSTOMERS_CREATE->value)
+        ->middlewareFor(['edit', 'update'], 'permission:'.PermissionEnums::CUSTOMERS_EDIT->value)
+        ->middlewareFor('destroy', 'permission:'.PermissionEnums::CUSTOMERS_DELETE->value);
     Route::resource('suppliers', SupplierController::class)
-        ->middlewareFor(['index', 'show'], 'permission:suppliers-access')
-        ->middlewareFor(['create', 'store'], 'permission:suppliers-create')
-        ->middlewareFor(['edit', 'update'], 'permission:suppliers-edit')
-        ->middlewareFor('destroy', 'permission:suppliers-delete');
+        ->middlewareFor(['index', 'show'], 'permission:'.PermissionEnums::SUPPLIERS_ACCESS->value)
+        ->middlewareFor(['create', 'store'], 'permission:'.PermissionEnums::SUPPLIERS_CREATE->value)
+        ->middlewareFor(['edit', 'update'], 'permission:'.PermissionEnums::SUPPLIERS_EDIT->value)
+        ->middlewareFor('destroy', 'permission:'.PermissionEnums::SUPPLIERS_DELETE->value);
 
     Route::get('/stock-management', [StockManagementController::class, 'index'])
-        ->middleware('permission:stock-management-access')
+        ->middleware('permission:'.PermissionEnums::STOCK_MANAGEMENT_ACCESS->value)
         ->name('stock-management.index');
     Route::get('/stock-management/create', [StockManagementController::class, 'create'])
-        ->middleware('permission:stock-management-create')
+        ->middleware('permission:'.PermissionEnums::STOCK_MANAGEMENT_CREATE->value)
         ->name('stock-management.create');
     Route::post('/stock-management', [StockManagementController::class, 'store'])
-        ->middleware('permission:stock-management-create')
+        ->middleware('permission:'.PermissionEnums::STOCK_MANAGEMENT_CREATE->value)
         ->name('stock-management.store');
     Route::get('/stock-management/{stockTransaction}/edit', [StockManagementController::class, 'edit'])
-        ->middleware('permission:stock-management-edit')
+        ->middleware('permission:'.PermissionEnums::STOCK_MANAGEMENT_EDIT->value)
         ->name('stock-management.edit');
     Route::put('/stock-management/{stockTransaction}', [StockManagementController::class, 'update'])
-        ->middleware('permission:stock-management-edit')
+        ->middleware('permission:'.PermissionEnums::STOCK_MANAGEMENT_EDIT->value)
         ->name('stock-management.update');
     Route::delete('/stock-management/{stockTransaction}', [StockManagementController::class, 'destroy'])
-        ->middleware('permission:stock-management-delete')
+        ->middleware('permission:'.PermissionEnums::STOCK_MANAGEMENT_DELETE->value)
         ->name('stock-management.destroy');
 
     //route customer history
-    Route::get('/customers/{customer}/history', [CustomerController::class, 'getHistory'])->middleware('permission:transactions-access')->name('customers.history');
+    Route::get('/customers/{customer}/history', [CustomerController::class, 'getHistory'])->middleware('permission:'.PermissionEnums::TRANSACTIONS_ACCESS->value)->name('customers.history');
 
     //route customer store via AJAX (no redirect)
-    Route::post('/customers/store-ajax', [CustomerController::class, 'storeAjax'])->middleware('permission:customers-create')->name('customers.storeAjax');
+    Route::post('/customers/store-ajax', [CustomerController::class, 'storeAjax'])->middleware('permission:'.PermissionEnums::CUSTOMERS_CREATE->value)->name('customers.storeAjax');
 
     //route transaction
-    Route::get('/transactions', [TransactionController::class, 'index'])->middleware('permission:transactions-access')->name('transactions.index');
+    Route::get('/transactions', [TransactionController::class, 'index'])->middleware('permission:'.PermissionEnums::TRANSACTIONS_ACCESS->value)->name('transactions.index');
 
     //route transaction searchProduct
-    Route::post('/transactions/searchProduct', [TransactionController::class, 'searchProduct'])->middleware('permission:transactions-access')->name('transactions.searchProduct');
+    Route::post('/transactions/searchProduct', [TransactionController::class, 'searchProduct'])->middleware('permission:'.PermissionEnums::TRANSACTIONS_ACCESS->value)->name('transactions.searchProduct');
 
     //route transaction addToCart
-    Route::post('/transactions/addToCart', [TransactionController::class, 'addToCart'])->middleware('permission:transactions-access')->name('transactions.addToCart');
+    Route::post('/transactions/addToCart', [TransactionController::class, 'addToCart'])->middleware('permission:'.PermissionEnums::TRANSACTIONS_ACCESS->value)->name('transactions.addToCart');
 
     //route transaction destroyCart
-    Route::delete('/transactions/{cart_id}/destroyCart', [TransactionController::class, 'destroyCart'])->middleware('permission:transactions-access')->name('transactions.destroyCart');
+    Route::delete('/transactions/{cart_id}/destroyCart', [TransactionController::class, 'destroyCart'])->middleware('permission:'.PermissionEnums::TRANSACTIONS_ACCESS->value)->name('transactions.destroyCart');
 
     //route transaction updateCart
-    Route::patch('/transactions/{cart_id}/updateCart', [TransactionController::class, 'updateCart'])->middleware('permission:transactions-access')->name('transactions.updateCart');
+    Route::patch('/transactions/{cart_id}/updateCart', [TransactionController::class, 'updateCart'])->middleware('permission:'.PermissionEnums::TRANSACTIONS_ACCESS->value)->name('transactions.updateCart');
 
     //route hold transaction
-    Route::post('/transactions/hold', [TransactionController::class, 'holdCart'])->middleware('permission:transactions-access')->name('transactions.hold');
-    Route::post('/transactions/{holdId}/resume', [TransactionController::class, 'resumeCart'])->middleware('permission:transactions-access')->name('transactions.resume');
-    Route::delete('/transactions/{holdId}/clearHold', [TransactionController::class, 'clearHold'])->middleware('permission:transactions-access')->name('transactions.clearHold');
-    Route::get('/transactions/held', [TransactionController::class, 'getHeldCarts'])->middleware('permission:transactions-access')->name('transactions.held');
+    Route::post('/transactions/hold', [TransactionController::class, 'holdCart'])->middleware('permission:'.PermissionEnums::TRANSACTIONS_ACCESS->value)->name('transactions.hold');
+    Route::post('/transactions/{holdId}/resume', [TransactionController::class, 'resumeCart'])->middleware('permission:'.PermissionEnums::TRANSACTIONS_ACCESS->value)->name('transactions.resume');
+    Route::delete('/transactions/{holdId}/clearHold', [TransactionController::class, 'clearHold'])->middleware('permission:'.PermissionEnums::TRANSACTIONS_ACCESS->value)->name('transactions.clearHold');
+    Route::get('/transactions/held', [TransactionController::class, 'getHeldCarts'])->middleware('permission:'.PermissionEnums::TRANSACTIONS_ACCESS->value)->name('transactions.held');
 
     //route transaction store
-    Route::post('/transactions/store', [TransactionController::class, 'store'])->middleware('permission:transactions-access')->name('transactions.store');
-    Route::get('/transactions/{invoice}/print', [TransactionController::class, 'print'])->middleware('permission:transactions-access')->name('transactions.print');
-    Route::get('/transactions/history', [TransactionController::class, 'history'])->middleware('permission:transactions-access')->name('transactions.history');
+    Route::post('/transactions/store', [TransactionController::class, 'store'])->middleware('permission:'.PermissionEnums::TRANSACTIONS_ACCESS->value)->name('transactions.store');
+    Route::get('/transactions/{invoice}/print', [TransactionController::class, 'print'])->middleware('permission:'.PermissionEnums::TRANSACTIONS_ACCESS->value)->name('transactions.print');
+    Route::get('/transactions/history', [TransactionController::class, 'history'])->middleware('permission:'.PermissionEnums::TRANSACTIONS_ACCESS->value)->name('transactions.history');
 
-    Route::get('/settings/payments', [PaymentSettingController::class, 'edit'])->middleware('permission:settings-access')->name('settings.payments.edit');
-    Route::put('/settings/payments', [PaymentSettingController::class, 'update'])->middleware('permission:settings-access')->name('settings.payments.update');
-    Route::get('/settings/store', [StoreSettingController::class, 'edit'])->middleware('permission:settings-access')->name('settings.store.edit');
-    Route::put('/settings/store', [StoreSettingController::class, 'update'])->middleware('permission:settings-access')->name('settings.store.update');
+    Route::get('/settings/payments', [PaymentSettingController::class, 'edit'])->middleware('permission:'.PermissionEnums::SETTINGS_ACCESS->value)->name('settings.payments.edit');
+    Route::put('/settings/payments', [PaymentSettingController::class, 'update'])->middleware('permission:'.PermissionEnums::SETTINGS_ACCESS->value)->name('settings.payments.update');
+    Route::get('/settings/store', [StoreSettingController::class, 'edit'])->middleware('permission:'.PermissionEnums::SETTINGS_ACCESS->value)->name('settings.store.edit');
+    Route::put('/settings/store', [StoreSettingController::class, 'update'])->middleware('permission:'.PermissionEnums::SETTINGS_ACCESS->value)->name('settings.store.update');
 
     //reports
-    Route::get('/reports/sales', [SalesReportController::class, 'index'])->middleware('permission:reports-access')->name('reports.sales.index');
-    Route::get('/reports/profits', [ProfitReportController::class, 'index'])->middleware('permission:profits-access')->name('reports.profits.index');
+    Route::get('/reports/sales', [SalesReportController::class, 'index'])->middleware('permission:'.PermissionEnums::REPORTS_ACCESS->value)->name('reports.sales.index');
+    Route::get('/reports/profits', [ProfitReportController::class, 'index'])->middleware('permission:'.PermissionEnums::PROFITS_ACCESS->value)->name('reports.profits.index');
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');

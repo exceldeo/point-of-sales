@@ -54,28 +54,28 @@ export default function Menu() {
                 {
                     title: "Kategori",
                     href: route("categories.index"),
-                    active: url === "/dashboard/categories" ? true : false, // Update comparison here
+                    active: url === "/categories" ? true : false, // Update comparison here
                     icon: <IconFolder size={20} strokeWidth={1.5} />,
                     permissions: hasAnyPermission(["categories-access"]),
                 },
                 {
                     title: "Produk",
                     href: route("products.index"),
-                    active: url === "/dashboard/products" ? true : false, // Update comparison here
+                    active: url === "/products" ? true : false, // Update comparison here
                     icon: <IconBox size={20} strokeWidth={1.5} />,
                     permissions: hasAnyPermission(["products-access"]),
                 },
                 {
                     title: "Pelanggan",
                     href: route("customers.index"),
-                    active: url === "/dashboard/customers" ? true : false, // Update comparison here
+                    active: url === "/customers" ? true : false, // Update comparison here
                     icon: <IconUsersPlus size={20} strokeWidth={1.5} />,
                     permissions: hasAnyPermission(["customers-access"]),
                 },
                 {
                     title: "Pemasok",
                     href: route("suppliers.index"),
-                    active: url === "/dashboard/suppliers" ? true : false, // Update comparison here
+                    active: url === "/suppliers" ? true : false, // Update comparison here
                     icon: <IconUsersPlus size={20} strokeWidth={1.5} />,
                     permissions: hasAnyPermission(["suppliers-access"]),
                 },
@@ -87,7 +87,7 @@ export default function Menu() {
                 {
                     title: "Transaksi",
                     href: route("transactions.index"),
-                    active: url === "/dashboard/transactions" ? true : false, // Update comparison here
+                    active: url === "/transactions" ? true : false, // Update comparison here
                     icon: <IconShoppingCart size={20} strokeWidth={1.5} />,
                     permissions: hasAnyPermission(["transactions-access"]),
                 },
@@ -95,7 +95,7 @@ export default function Menu() {
                     title: "Riwayat Transaksi",
                     href: route("transactions.history"),
                     active:
-                        url === "/dashboard/transactions/history"
+                        url === "/transactions/history"
                             ? true
                             : false,
                     icon: <IconClockHour6 size={20} strokeWidth={1.5} />,
@@ -104,7 +104,7 @@ export default function Menu() {
                 {
                     title: "Stock Management",
                     href: route("stock-management.index"),
-                    active: url === "/dashboard/stock-management",
+                    active: url === "/stock-management",
                     icon: <IconArrowsUpDown size={20} strokeWidth={1.5} />,
                     permissions: hasAnyPermission(["stock-management-access"]),
                 },
@@ -116,7 +116,7 @@ export default function Menu() {
                 {
                     title: "Laporan Penjualan",
                     href: route("reports.sales.index"),
-                    active: url.startsWith("/dashboard/reports/sales"),
+                    active: url.startsWith("/reports/sales"),
                     icon: (
                         <IconChartArrowsVertical size={20} strokeWidth={1.5} />
                     ),
@@ -125,14 +125,14 @@ export default function Menu() {
                 {
                     title: "Laporan Keuntungan",
                     href: route("reports.profits.index"),
-                    active: url.startsWith("/dashboard/reports/profits"),
+                    active: url.startsWith("/reports/profits"),
                     icon: <IconChartBarPopular size={20} strokeWidth={1.5} />,
                     permissions: hasAnyPermission(["profits-access"]),
                 },
                 {
                     title: "Pembukuan Transaksi",
                     href: route("reports.sales.index"),
-                    active: url.startsWith("/dashboard/reports/sales"),
+                    active: url.startsWith("/reports/sales"),
                     icon: <IconArrowsRightLeft size={20} strokeWidth={1.5} />,
                     permissions: hasAnyPermission(["reports-access"]),
                 },
@@ -144,14 +144,14 @@ export default function Menu() {
                 {
                     title: "Hak Akses",
                     href: route("permissions.index"),
-                    active: url === "/dashboard/permissions" ? true : false, // Update comparison here
+                    active: url === "/permissions" ? true : false, // Update comparison here
                     icon: <IconUserBolt size={20} strokeWidth={1.5} />,
                     permissions: hasAnyPermission(["permissions-access"]),
                 },
                 {
                     title: "Akses Group",
                     href: route("roles.index"),
-                    active: url === "/dashboard/roles" ? true : false, // Update comparison here
+                    active: url === "/roles" ? true : false, // Update comparison here
                     icon: <IconUserShield size={20} strokeWidth={1.5} />,
                     permissions: hasAnyPermission(["roles-access"]),
                 },
@@ -164,7 +164,7 @@ export default function Menu() {
                             title: "Data Pengguna",
                             href: route("users.index"),
                             icon: <IconTable size={20} strokeWidth={1.5} />,
-                            active: url === "/dashboard/users" ? true : false,
+                            active: url === "/users" ? true : false,
                             permissions: hasAnyPermission(["users-access"]),
                         },
                         {
@@ -174,15 +174,15 @@ export default function Menu() {
                                 <IconCirclePlus size={20} strokeWidth={1.5} />
                             ),
                             active:
-                                url === "/dashboard/users/create"
+                                url === "/users/create"
                                     ? true
                                     : false,
                             permissions: hasAnyPermission(["users-create"]),
                         },
                         {
                             title: "Data Karyawan",
-                            href: route("employees.index"),
-                            active: url === "/dashboard/employees",
+                            href: route("employee-management.index"),
+                            active: url === "/employee-management",
                             icon: <IconBriefcase size={20} strokeWidth={1.5} />,
                             permissions: hasAnyPermission(["employee-access"]),
                         },
@@ -196,21 +196,21 @@ export default function Menu() {
                 {
                     title: "Payment Gateway",
                     href: route("settings.payments.edit"),
-                    active: url === "/dashboard/settings/payments",
+                    active: url === "/settings/payments",
                     icon: <IconCreditCard size={20} strokeWidth={1.5} />,
                     permissions: hasAnyPermission(["settings-access"]),
                 },
                 {
                     title: "Store Setting",
                     href: route("settings.store.edit"),
-                    active: url === "/dashboard/settings/store",
+                    active: url === "/settings/store",
                     icon: <IconBuildingStore size={20} strokeWidth={1.5} />,
                     permissions: hasAnyPermission(["settings-access"]),
                 },
                 {
                     title: "Profile",
                     href: route("profile.edit"),
-                    active: url === "/dashboard/profile",
+                    active: url === "/profile",
                     icon: <IconUserCircle size={20} strokeWidth={1.5} />,
                     permissions: true,
                 },

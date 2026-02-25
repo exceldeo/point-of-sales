@@ -1,5 +1,5 @@
-import DashboardLayout from "@/Layouts/DashboardLayout";
-import { Head, Link } from "@inertiajs/react";
+import AppLayout from "@/Layouts/AppLayout";
+import { Head, Link, usePage } from "@inertiajs/react";
 import { useEffect, useMemo, useRef } from "react";
 import Chart from "chart.js/auto";
 import {
@@ -147,6 +147,8 @@ export default function Dashboard({
     recentTransactions = [],
     topCustomers = [],
 }) {
+    const { auth } = usePage().props;
+    console.log(auth)
     const chartRef = useRef(null);
     const chartInstance = useRef(null);
 
@@ -453,4 +455,4 @@ export default function Dashboard({
     );
 }
 
-Dashboard.layout = (page) => <DashboardLayout children={page} />;
+Dashboard.layout = (page) => <AppLayout children={page} />;

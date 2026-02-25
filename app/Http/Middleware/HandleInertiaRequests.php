@@ -34,7 +34,6 @@ class HandleInertiaRequests extends Middleware
             'auth' => [
                 'user' => $request->user(),
                 'permissions' => $request->user() ? $request->user()->getPermissions() : [],
-                'super' => $request->user() ? $request->user()->isSuperAdmin() : false,
             ],
         ];
     }

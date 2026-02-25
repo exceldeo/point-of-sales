@@ -42,7 +42,7 @@ class EmployeeManagementController extends Controller
             ->orderBy('name')
             ->get();
 
-        return Inertia::render('Dashboard/Employees/Index', [
+        return Inertia::render('Employees/Index', [
             'employees' => $employees,
             'permissionGroups' => $permissionGroups,
             'employeeRoles' => $employeeRoles,

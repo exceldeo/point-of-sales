@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\PaymentSetting;
 use Illuminate\Database\Seeder;
+use App\Enums\PaymentMethodEnums;
 
 class PaymentSettingSeeder extends Seeder
 {
@@ -13,7 +14,7 @@ class PaymentSettingSeeder extends Seeder
     public function run(): void
     {
         PaymentSetting::firstOrCreate([], [
-            'default_gateway' => 'cash',
+            'default_gateway' => PaymentMethodEnums::CASH->value,
             'midtrans_enabled' => false,
             'xendit_enabled' => false,
         ]);

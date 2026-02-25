@@ -4,6 +4,7 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
+use App\Enums\PermissionEnums;
 
 class RoleSeeder extends Seeder
 {
@@ -13,18 +14,6 @@ class RoleSeeder extends Seeder
     // Refactor the RoleSeeder to improve readability and avoid repetitive code
     public function run(): void
     {
-        // $this->createRoleWithPermissions('users-access', '%users%');
-        // $this->createRoleWithPermissions('roles-access', '%roles%');
-        // $this->createRoleWithPermissions('permission-access', '%permissions%');
-        // $this->createRoleWithPermissions('categories-access', '%categories%');
-        // $this->createRoleWithPermissions('products-access', '%products%');
-        // $this->createRoleWithPermissions('customers-access', '%customers%');
-        // $this->createRoleWithPermissions('transactions-access', '%transactions%');
-        // $this->createRoleWithPermissions('reports-access', '%reports%');
-        // $this->createRoleWithPermissions('profits-access', '%profits%');
-        // $this->createRoleWithPermissions('settings-access', '%settings%');
-            // $this->createRoleWithPermissions('settings-access', '%store-settings%');
-
         // Create super-admin role with all permissions
         $superAdminRole = Role::create(['name' => 'super-admin']);
         $allPermissions  = Permission::all();
@@ -33,10 +22,10 @@ class RoleSeeder extends Seeder
         // Create cashier role with basic permissions for public registration
         $cashierRole        = Role::create(['name' => 'kasir']);
         $cashierPermissions = Permission::whereIn('name', [
-            'transactions-access',
-            'customers-access',
-            'customers-create',
-            'stock-management-access',
+            PermissionEnums::TRANSACTIONS_ACCESS->value,
+            PermissionEnums::CUSTOMERS_ACCESS->value,
+            PermissionEnums::CUSTOMERS_CREATE->value,
+            PermissionEnums::STOCK_MANAGEMENT_ACCESS->value
         ])->get();
         $cashierRole->givePermissionTo($cashierPermissions);
     }

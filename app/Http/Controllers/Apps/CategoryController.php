@@ -23,7 +23,7 @@ class CategoryController extends Controller
         })->latest()->paginate(2);
 
         //return inertia
-        return Inertia::render('Dashboard/Categories/Index', [
+        return Inertia::render('Categories/Index', [
             'categories' => $categories,
         ]);
     }
@@ -35,7 +35,7 @@ class CategoryController extends Controller
      */
     public function create()
     {
-        return Inertia::render('Dashboard/Categories/Create');
+        return Inertia::render('Categories/Create');
     }
 
     /**
@@ -78,7 +78,7 @@ class CategoryController extends Controller
      */
     public function edit(Category $category)
     {
-        return Inertia::render('Dashboard/Categories/Edit', [
+        return Inertia::render('Categories/Edit', [
             'category' => $category,
         ]);
     }

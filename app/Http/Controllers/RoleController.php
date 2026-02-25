@@ -32,7 +32,7 @@ class RoleController extends Controller
             ->get();
 
         // render view
-        return Inertia::render('Dashboard/Roles/Index', [
+        return Inertia::render('Roles/Index', [
             'roles' => $roles,
             'permissions' => $permissions
         ]);

@@ -17,7 +17,7 @@ class StoreSettingController extends Controller
             'store_phone' => null,
         ]);
 
-        return Inertia::render('Dashboard/Settings/Store', [
+        return Inertia::render('Settings/Store', [
             'setting' => $setting,
         ]);
     }

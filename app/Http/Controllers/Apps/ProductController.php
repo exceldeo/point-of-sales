@@ -27,7 +27,7 @@ class ProductController extends Controller
         })->with('category')->latest()->paginate(15);
 
         //return inertia
-        return Inertia::render('Dashboard/Products/Index', [
+        return Inertia::render('Products/Index', [
             'products' => $products,
         ]);
     }
@@ -48,7 +48,7 @@ class ProductController extends Controller
         $employees = (new EmployeeManagementController())->getEmployees();
 
         //return inertia
-        return Inertia::render('Dashboard/Products/Create', [
+        return Inertia::render('Products/Create', [
             'categories' => $categories,
             'employees' => $employees,
         ]);
@@ -125,7 +125,7 @@ class ProductController extends Controller
 
         $employees = (new EmployeeManagementController())->getEmployees();
 
-        return Inertia::render('Dashboard/Products/Edit', [
+        return Inertia::render('Products/Edit', [
             'product' => $product,
             'categories' => $categories,
             'employees' => $employees,

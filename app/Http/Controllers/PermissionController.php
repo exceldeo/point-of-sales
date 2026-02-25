@@ -21,7 +21,7 @@ class PermissionController extends Controller
             ->withQueryString();
 
         // render view
-        return Inertia::render('Dashboard/Permissions/Index', [
+        return Inertia::render('Permissions/Index', [
             'permissions' => $permissions
         ]);
     }

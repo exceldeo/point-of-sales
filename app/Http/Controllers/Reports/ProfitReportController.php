@@ -62,7 +62,7 @@ class ProfitReportController extends Controller
             'best_profit' => (int) ($bestTransaction?->total_profit ?? 0),
         ];
 
-        return Inertia::render('Dashboard/Reports/Profit', [
+        return Inertia::render('Reports/Profit', [
             'transactions' => $transactions,
             'summary' => $summary,
             'filters' => $filters,

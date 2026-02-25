@@ -27,7 +27,7 @@ class UserController extends Controller
             ->withQueryString();
 
         // render view
-        return Inertia::render('Dashboard/Users/Index', [
+        return Inertia::render('Users/Index', [
             'users' => $users
         ]);
     }
@@ -44,7 +44,7 @@ class UserController extends Controller
             ->get();
 
         // render view
-        return Inertia::render('Dashboard/Users/Create', [
+        return Inertia::render('Users/Create', [
             'roles' => $roles
         ]);
     }
@@ -83,7 +83,7 @@ class UserController extends Controller
         $user->load(['roles' => fn($query) => $query->select('id', 'name'), 'roles.permissions' => fn($query) => $query->select('id', 'name')]);
 
         // render view
-        return Inertia::render('Dashboard/Users/Edit', [
+        return Inertia::render('Users/Edit', [
             'roles' => $roles,
             'user' => $user
         ]);

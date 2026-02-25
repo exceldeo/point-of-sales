@@ -18,7 +18,7 @@ class SupplierController extends Controller
             $suppliers = $suppliers->where('name', 'like', '%' . request()->search . '%');
         })->latest()->paginate(5);
 
-        return Inertia::render('Dashboard/Suppliers/Index', [
+        return Inertia::render('Suppliers/Index', [
             'suppliers' => $suppliers,
         ]);
     }
@@ -28,7 +28,7 @@ class SupplierController extends Controller
      */
     public function create()
     {
-        return Inertia::render('Dashboard/Suppliers/Create');
+        return Inertia::render('Suppliers/Create');
     }
 
     /**
@@ -56,7 +56,7 @@ class SupplierController extends Controller
      */
     public function edit(Supplier $supplier)
     {
-        return Inertia::render('Dashboard/Suppliers/Edit', [
+        return Inertia::render('Suppliers/Edit', [
             'supplier' => $supplier,
         ]);
     }

@@ -22,7 +22,7 @@ class CustomerController extends Controller
         })->latest()->paginate(5);
 
         //return inertia
-        return Inertia::render('Dashboard/Customers/Index', [
+        return Inertia::render('Customers/Index', [
             'customers' => $customers,
         ]);
     }
@@ -34,7 +34,7 @@ class CustomerController extends Controller
      */
     public function create()
     {
-        return Inertia::render('Dashboard/Customers/Create');
+        return Inertia::render('Customers/Create');
     }
 
     /**
@@ -113,7 +113,7 @@ class CustomerController extends Controller
      */
     public function edit(Customer $customer)
     {
-        return Inertia::render('Dashboard/Customers/Edit', [
+        return Inertia::render('Customers/Edit', [
             'customer' => $customer,
         ]);
     }

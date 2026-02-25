@@ -96,7 +96,7 @@ class TransactionController extends Controller
             $defaultGateway = 'cash';
         }
 
-        return Inertia::render('Dashboard/Transactions/Index', [
+        return Inertia::render('Transactions/Index', [
             'carts'                 => $carts,
             'carts_total'           => $carts_total,
             'heldCarts'             => $heldCarts,
@@ -550,7 +550,7 @@ class TransactionController extends Controller
             'store_phone' => null,
         ]);
 
-        return Inertia::render('Dashboard/Transactions/Print', [
+        return Inertia::render('Transactions/Print', [
             'transaction' => $transaction,
             'storeSetting' => $storeSetting,
             'backUrl' => $request->input('backUrl') ?? route('transactions.index'),
@@ -625,7 +625,7 @@ class TransactionController extends Controller
                 ];
              }, PaymentMethodEnums::options());
 
-        return Inertia::render('Dashboard/Transactions/History', [
+        return Inertia::render('Transactions/History', [
             'transactions' => $transactions,
             'filters'      => $filters,
             'cashiers'     => $cashiers,

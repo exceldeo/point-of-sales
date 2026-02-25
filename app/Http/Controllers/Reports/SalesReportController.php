@@ -69,7 +69,7 @@ class SalesReportController extends Controller
                 : 0,
         ];
 
-        return Inertia::render('Dashboard/Reports/Sales', [
+        return Inertia::render('Reports/Sales', [
             'transactions' => $transactions,
             'summary' => $summary,
             'filters' => $filters,
