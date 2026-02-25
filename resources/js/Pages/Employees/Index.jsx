@@ -14,7 +14,7 @@ import ListBox from "@/Components/Common/ListBox";
 import Table from "@/Components/Common/Table";
 import Pagination from "@/Components/Common/Pagination";
 import Button from "@/Components/Common/Button";
-import hasAnyPermission from "@/Utils/Permission";
+import hasAnyPermission, { permissionEnums } from "@/Utils/Permission";
 import Modal from "@/Components/Common/Modal";
 
 const formatCurrency = (value = 0) =>
@@ -86,7 +86,7 @@ export default function Index({
                         </p>
                     </div>
 
-                    {hasAnyPermission(["employee-edit"]) && (
+                    {hasAnyPermission([permissionEnums.EMPLOYEE_EDIT]) && (
                         <Button
                             type={"button"}
                             icon={

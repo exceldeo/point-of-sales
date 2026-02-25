@@ -10,7 +10,7 @@ import {
     IconTrendingDown,
     IconTrendingUp,
 } from "@tabler/icons-react";
-import hasAnyPermission from "@/Utils/Permission";
+import hasAnyPermission, { permissionEnums } from "@/Utils/Permission";
 import Search from "@/Components/Common/Search";
 import Table from "@/Components/Common/Table";
 import Pagination from "@/Components/Common/Pagination";
@@ -35,7 +35,7 @@ export default function Index({ transactions }) {
                             {transactions.total || 0} transaksi stok tercatat
                         </p>
                     </div>
-                    {hasAnyPermission(["stock-management-create"]) && (
+                    {hasAnyPermission([permissionEnums.STOCK_MANAGEMENT_CREATE]) && (
                         <Link
                             href={route("stock-management.create")}
                             className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-primary-500 hover:bg-primary-600 text-white text-sm font-medium"
@@ -107,7 +107,7 @@ export default function Index({ transactions }) {
                                     <Table.Td>
                                         <div className="flex gap-2 justify-end">
                                             {hasAnyPermission([
-                                                "stock-management-edit",
+                                                permissionEnums.STOCK_MANAGEMENT_EDIT,
                                             ]) && (
                                                 <Button
                                                     type={"edit"}
@@ -127,7 +127,7 @@ export default function Index({ transactions }) {
                                                 />
                                             )}
                                             {hasAnyPermission([
-                                                "stock-management-delete",
+                                                permissionEnums.STOCK_MANAGEMENT_DELETE,
                                             ]) && (
                                                 <Button
                                                     type={"delete"}

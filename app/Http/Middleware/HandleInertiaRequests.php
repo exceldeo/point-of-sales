@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Enums\PermissionEnums;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
@@ -29,12 +30,19 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
+        $permissionEnums = [];
+
+        foreach (PermissionEnums::cases() as $permissionEnum) {
+            $permissionEnums[$permissionEnum->name] = $permissionEnum->value;
+        }
+
         return [
             ...parent::share($request),
             'auth' => [
                 'user' => $request->user(),
                 'permissions' => $request->user() ? $request->user()->getPermissions() : [],
             ],
+            'permissionEnums' => $permissionEnums,
         ];
     }
 }

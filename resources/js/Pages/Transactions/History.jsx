@@ -14,7 +14,7 @@ import {
     IconFilter,
     IconX,
 } from "@tabler/icons-react";
-import hasAnyPermission from "@/Utils/Permission";
+import hasAnyPermission, { permissionEnums } from "@/Utils/Permission";
 
 const defaultFilters = {
     invoice: "",
@@ -300,7 +300,7 @@ const History = ({
                                             Total
                                         </th>
                                         {hasAnyPermission([
-                                            "profits-access",
+                                            permissionEnums.PROFITS_ACCESS,
                                         ]) && (
                                             <th className="px-4 py-4 text-right text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
                                                 Profit
@@ -363,7 +363,7 @@ const History = ({
                                                 )}
                                             </td>
                                             {hasAnyPermission([
-                                                "profits-access",
+                                                permissionEnums.PROFITS_ACCESS,
                                             ]) && (
                                                 <td className="px-4 py-4 text-right text-sm font-semibold text-success-600 dark:text-success-400">
                                                     {formatCurrency(

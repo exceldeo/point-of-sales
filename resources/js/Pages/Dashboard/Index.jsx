@@ -16,6 +16,7 @@ import {
     IconChartBar,
     IconClock,
 } from "@tabler/icons-react";
+import hasAnyPermission, { permissionEnums } from "@/Utils/Permission";
 
 const formatCurrency = (value = 0) =>
     new Intl.NumberFormat("id-ID", {
@@ -147,8 +148,6 @@ export default function Dashboard({
     recentTransactions = [],
     topCustomers = [],
 }) {
-    const { auth } = usePage().props;
-    console.log(auth)
     const chartRef = useRef(null);
     const chartInstance = useRef(null);
 
@@ -259,13 +258,15 @@ export default function Dashboard({
                             Ringkasan aktivitas bisnis Anda
                         </p>
                     </div>
-                    <Link
-                        href={route("transactions.index")}
-                        className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-primary-500 hover:bg-primary-600 text-white text-sm font-medium transition-colors shadow-lg shadow-primary-500/30"
-                    >
-                        <IconShoppingCart size={18} />
-                        <span>Transaksi Baru</span>
-                    </Link>
+                    {hasAnyPermission([permissionEnums.TRANSACTIONS_ACCESS]) && (
+                        <Link
+                            href={route("transactions.index")}
+                            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-primary-500 hover:bg-primary-600 text-white text-sm font-medium transition-colors shadow-lg shadow-primary-500/30"
+                        >
+                            <IconShoppingCart size={18} />
+                            <span>Transaksi Baru</span>
+                        </Link>
+                    )}
                 </div>
 
                 {/* Main Stat Cards */}

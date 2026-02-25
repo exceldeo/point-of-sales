@@ -12,7 +12,7 @@ import {
     IconX,
     IconUser,
 } from "@tabler/icons-react";
-import hasAnyPermission from "@/Utils/Permission";
+import hasAnyPermission, { permissionEnums } from "@/Utils/Permission";
 
 export default function POSLayout({ children }) {
     const { auth } = usePage().props;
@@ -99,7 +99,7 @@ export default function POSLayout({ children }) {
                 <div className="flex items-center gap-2 lg:gap-3">
                     {/* Quick Actions */}
                     <nav className="hidden lg:flex items-center gap-1">
-                        {hasAnyPermission(["dashboard-access"]) && (
+                        {hasAnyPermission([permissionEnums.DASHBOARD_ACCESS]) && (
                             <Link
                                 href={route("dashboard")}
                                 className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100 dark:text-slate-400 dark:hover:text-white dark:hover:bg-slate-800 transition-colors"
@@ -177,7 +177,7 @@ export default function POSLayout({ children }) {
                         onClick={(e) => e.stopPropagation()}
                     >
                         <nav className="p-4 space-y-2">
-                            {hasAnyPermission(["dashboard-access"]) && (
+                            {hasAnyPermission([permissionEnums.DASHBOARD_ACCESS]) && (
                                 <Link
                                     href={route("dashboard")}
                                     className="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800 transition-colors"
@@ -188,22 +188,26 @@ export default function POSLayout({ children }) {
                                     </span>
                                 </Link>
                             )}
-                            <Link
-                                href={route("transactions.history")}
-                                className="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800 transition-colors"
-                            >
-                                <IconHistory size={20} />
-                                <span className="font-medium">
-                                    Riwayat Transaksi
-                                </span>
-                            </Link>
-                            <Link
-                                href={route("profile.edit")}
-                                className="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800 transition-colors"
-                            >
-                                <IconUser size={20} />
-                                <span className="font-medium">Profil</span>
-                            </Link>
+                            {hasAnyPermission([permissionEnums.TRANSACTIONS_ACCESS]) && (
+                                <Link
+                                    href={route("transactions.history")}
+                                    className="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800 transition-colors"
+                                >
+                                    <IconHistory size={20} />
+                                    <span className="font-medium">
+                                        Riwayat Transaksi
+                                    </span>
+                                </Link>
+                            )}
+                            {hasAnyPermission([permissionEnums.PROFILE_ACCESS]) && (
+                                <Link
+                                    href={route("profile.edit")}
+                                    className="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800 transition-colors"
+                                >
+                                    <IconUser size={20} />
+                                    <span className="font-medium">Profil</span>
+                                </Link>
+                            )}
                             <hr className="border-slate-200 dark:border-slate-700" />
                             <Link
                                 href={route("logout")}
