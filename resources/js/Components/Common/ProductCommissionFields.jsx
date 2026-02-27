@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import Input from "@/Components/Common/Input";
 import Swal from "sweetalert2";
+import toast from "react-hot-toast";
 
 export default function ProductCommissionFields({
     users,
@@ -51,19 +52,13 @@ export default function ProductCommissionFields({
         setSelectedRoleId("");
 
         if (rowsToAdd.length === 0) {
-            Swal.fire({
-                title: "Info",
-                text: "Semua pengguna dengan role tersebut sudah ditambahkan.",
-                icon: "info",
-                confirmButtonColor: "#6366f1",
-            });
+            toast.error(
+                "Semua pengguna dengan role tersebut sudah ditambahkan.",
+            );
         } else {
-            Swal.fire({
-                title: "Berhasil",
-                text: `${rowsToAdd.length} pengguna berhasil ditambahkan.`,
-                icon: "success",
-                confirmButtonColor: "#6366f1",
-            });
+            toast.success(
+                `${rowsToAdd.length} pengguna berhasil ditambahkan sebagai komisi.`,
+            );
         }
     };
 
@@ -76,12 +71,7 @@ export default function ProductCommissionFields({
             prev.filter((rowIndex) => rowIndex !== index),
         );
 
-        Swal.fire({
-            title: "Berhasil",
-            text: "Komisi berhasil dihapus.",
-            icon: "success",
-            confirmButtonColor: "#6366f1",
-        });
+        toast.success("Baris komisi berhasil dihapus.");
     };
 
     const updateCommissionField = (index, field, value) => {
@@ -122,12 +112,7 @@ export default function ProductCommissionFields({
             ),
         );
 
-        Swal.fire({
-            title: "Berhasil",
-            text: "Komisi massal berhasil diterapkan.",
-            icon: "success",
-            confirmButtonColor: "#6366f1",
-        });
+        toast.success("Komisi massal berhasil diterapkan.");
     };
 
     return (
