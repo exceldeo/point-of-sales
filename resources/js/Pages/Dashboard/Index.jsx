@@ -17,13 +17,7 @@ import {
     IconClock,
 } from "@tabler/icons-react";
 import hasAnyPermission, { permissionEnums } from "@/Utils/Permission";
-
-const formatCurrency = (value = 0) =>
-    new Intl.NumberFormat("id-ID", {
-        style: "currency",
-        currency: "IDR",
-        minimumFractionDigits: 0,
-    }).format(value);
+import { formatCurrency } from "@/Utils/formatCurrency";
 
 // Stat Card Component
 function StatCard({ title, value, subtitle, icon: Icon, gradient, trend }) {
@@ -258,7 +252,9 @@ export default function Dashboard({
                             Ringkasan aktivitas bisnis Anda
                         </p>
                     </div>
-                    {hasAnyPermission([permissionEnums.TRANSACTIONS_ACCESS]) && (
+                    {hasAnyPermission([
+                        permissionEnums.TRANSACTIONS_ACCESS,
+                    ]) && (
                         <Link
                             href={route("transactions.index")}
                             className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-primary-500 hover:bg-primary-600 text-white text-sm font-medium transition-colors shadow-lg shadow-primary-500/30"

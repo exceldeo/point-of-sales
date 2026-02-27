@@ -15,6 +15,7 @@ import {
     IconX,
 } from "@tabler/icons-react";
 import hasAnyPermission, { permissionEnums } from "@/Utils/Permission";
+import formatCurrency from "@/Utils/formatCurrency";
 
 const defaultFilters = {
     invoice: "",
@@ -23,13 +24,6 @@ const defaultFilters = {
     cashier_id: "",
     user_id: "",
 };
-
-const formatCurrency = (value = 0) =>
-    new Intl.NumberFormat("id-ID", {
-        style: "currency",
-        currency: "IDR",
-        minimumFractionDigits: 0,
-    }).format(value);
 
 const History = ({
     transactions,

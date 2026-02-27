@@ -18,13 +18,7 @@ import Table from "@/Components/Common/Table";
 import Checkbox from "@/Components/Common/Checkbox";
 import Pagination from "@/Components/Common/Pagination";
 import Swal from "sweetalert2";
-
-const formatCurrency = (value = 0) =>
-    new Intl.NumberFormat("id-ID", {
-        style: "currency",
-        currency: "IDR",
-        minimumFractionDigits: 0,
-    }).format(value);
+import formatCurrency from "@/Utils/formatCurrency";
 
 // User Card for Grid View
 function UserCard({ user, isSelected, onSelect, onDelete }) {

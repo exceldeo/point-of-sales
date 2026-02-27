@@ -16,6 +16,7 @@ import {
     IconPencilCheck,
     IconShield,
 } from "@tabler/icons-react";
+import hasAnyPermission, { permissionEnums } from "@/Utils/Permission";
 
 // Role Card Component
 function RoleCard({ role, onEdit, onDelete }) {
@@ -59,23 +60,33 @@ function RoleCard({ role, onEdit, onDelete }) {
             </div>
 
             {/* Actions */}
-            <div className="flex border-t border-slate-100 dark:border-slate-800">
-                <button
-                    onClick={onEdit}
-                    className="flex-1 flex items-center justify-center gap-1.5 py-3 text-warning-600 hover:bg-warning-50 dark:hover:bg-warning-950/50 text-sm font-medium transition-colors"
-                >
-                    <IconPencilCog size={16} />
-                    <span>Edit</span>
-                </button>
-                <div className="w-px bg-slate-100 dark:bg-slate-800" />
-                <button
-                    onClick={onDelete}
-                    className="flex-1 flex items-center justify-center gap-1.5 py-3 text-danger-600 hover:bg-danger-50 dark:hover:bg-danger-950/50 text-sm font-medium transition-colors"
-                >
-                    <IconTrash size={16} />
-                    <span>Hapus</span>
-                </button>
-            </div>
+
+            {hasAnyPermission([
+                permissionEnums.ROLES_UPDATE,
+                permissionEnums.ROLES_DELETE,
+            ]) && (
+                <div className="flex border-t border-slate-100 dark:border-slate-800">
+                    {hasAnyPermission([permissionEnums.ROLES_UPDATE]) && (
+                        <button
+                            onClick={onEdit}
+                            className="flex-1 flex items-center justify-center gap-1.5 py-3 text-warning-600 hover:bg-warning-50 dark:hover:bg-warning-950/50 text-sm font-medium transition-colors"
+                        >
+                            <IconPencilCog size={16} />
+                            <span>Edit</span>
+                        </button>
+                    )}
+                    <div className="w-px bg-slate-100 dark:bg-slate-800" />
+                    {hasAnyPermission([permissionEnums.ROLES_DELETE]) && (
+                        <button
+                            onClick={onDelete}
+                            className="flex-1 flex items-center justify-center gap-1.5 py-3 text-danger-600 hover:bg-danger-50 dark:hover:bg-danger-950/50 text-sm font-medium transition-colors"
+                        >
+                            <IconTrash size={16} />
+                            <span>Hapus</span>
+                        </button>
+                    )}
+                </div>
+            )}
         </div>
     );
 }
@@ -103,7 +114,7 @@ export default function Index() {
     transform((data) => ({
         ...data,
         selectedPermission: data.selectedPermission.map(
-            (permission) => permission.id
+            (permission) => permission.id,
         ),
         _method: data.isUpdate === true ? "put" : "post",
     }));

@@ -17,13 +17,8 @@ import Search from "@/Components/Common/Search";
 import Table from "@/Components/Common/Table";
 import Pagination from "@/Components/Common/Pagination";
 import { getProductImageUrl } from "@/Utils/imageUrl";
-
-const formatCurrency = (value = 0) =>
-    new Intl.NumberFormat("id-ID", {
-        style: "currency",
-        currency: "IDR",
-        minimumFractionDigits: 0,
-    }).format(value);
+import formatCurrency from "@/Utils/formatCurrency";
+import { permissionEnums } from "@/Utils/Permission";
 
 // Product Card for Grid View
 function ProductCard({ product, index, currentPage, perPage }) {
@@ -71,20 +66,24 @@ function ProductCard({ product, index, currentPage, perPage }) {
 
                 {/* Action Buttons Overlay */}
                 <div className="absolute inset-0 bg-slate-900/0 group-hover:bg-slate-900/40 transition-all flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100">
-                    <Link
-                        href={route("products.edit", product.id)}
-                        className="p-2.5 rounded-xl bg-white text-warning-600 hover:bg-warning-50 shadow-lg transition-colors"
-                    >
-                        <IconPencilCog size={18} />
-                    </Link>
-                    <Button
-                        type={"delete"}
-                        icon={<IconTrash size={18} />}
-                        className={
-                            "p-2.5 rounded-xl bg-white text-danger-600 hover:bg-danger-50 shadow-lg"
-                        }
-                        url={route("products.destroy", product.id)}
-                    />
+                    {hasAnyPermission([permissionEnums.PRODUCTS_EDIT]) && (
+                        <Link
+                            href={route("products.edit", product.id)}
+                            className="p-2.5 rounded-xl bg-white text-warning-600 hover:bg-warning-50 shadow-lg transition-colors"
+                        >
+                            <IconPencilCog size={18} />
+                        </Link>
+                    )}
+                    {hasAnyPermission([permissionEnums.PRODUCTS_DELETE]) && (
+                        <Button
+                            type={"delete"}
+                            icon={<IconTrash size={18} />}
+                            className={
+                                "p-2.5 rounded-xl bg-white text-danger-600 hover:bg-danger-50 shadow-lg"
+                            }
+                            url={route("products.destroy", product.id)}
+                        />
+                    )}
                 </div>
             </div>
 
@@ -143,15 +142,19 @@ export default function Index({ products }) {
                             {products.total} produk terdaftar
                         </p>
                     </div>
-                    <Button
-                        type={"link"}
-                        icon={<IconCirclePlus size={18} strokeWidth={1.5} />}
-                        className={
-                            "bg-primary-500 hover:bg-primary-600 text-white shadow-lg shadow-primary-500/30"
-                        }
-                        label={"Tambah Produk"}
-                        href={route("products.create")}
-                    />
+                    {hasAnyPermission([permissionEnums.PRODUCTS_CREATE]) && (
+                        <Button
+                            type={"link"}
+                            icon={
+                                <IconCirclePlus size={18} strokeWidth={1.5} />
+                            }
+                            className={
+                                "bg-primary-500 hover:bg-primary-600 text-white shadow-lg shadow-primary-500/30"
+                            }
+                            label={"Tambah Produk"}
+                            href={route("products.create")}
+                        />
+                    )}
                 </div>
             </div>
 

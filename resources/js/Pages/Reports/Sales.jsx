@@ -17,6 +17,7 @@ import {
     IconSearch,
     IconCalendar,
 } from "@tabler/icons-react";
+import formatCurrency from "@/Utils/formatCurrency";
 
 // Summary Card Component
 const SummaryCard = ({ icon, title, value, description, gradient }) => (
@@ -51,15 +52,8 @@ const defaultFilterState = {
     customer_id: "",
 };
 
-const formatCurrency = (value = 0) =>
-    new Intl.NumberFormat("id-ID", {
-        style: "currency",
-        currency: "IDR",
-        minimumFractionDigits: 0,
-    }).format(value);
-
 const castFilterString = (value) =>
-    typeof value === "number" ? String(value) : value ?? "";
+    typeof value === "number" ? String(value) : (value ?? "");
 
 const Sales = ({ transactions, summary, filters, cashiers, customers }) => {
     const [showFilters, setShowFilters] = useState(false);
@@ -75,17 +69,17 @@ const Sales = ({ transactions, summary, filters, cashiers, customers }) => {
     const cashierFromFilters = useMemo(
         () =>
             cashiers.find(
-                (c) => castFilterString(c.id) === filterData.cashier_id
+                (c) => castFilterString(c.id) === filterData.cashier_id,
             ) ?? null,
-        [cashiers, filterData.cashier_id]
+        [cashiers, filterData.cashier_id],
     );
 
     const customerFromFilters = useMemo(
         () =>
             customers.find(
-                (c) => castFilterString(c.id) === filterData.customer_id
+                (c) => castFilterString(c.id) === filterData.customer_id,
             ) ?? null,
-        [customers, filterData.customer_id]
+        [customers, filterData.customer_id],
     );
 
     const [selectedCashier, setSelectedCashier] = useState(cashierFromFilters);
@@ -94,11 +88,11 @@ const Sales = ({ transactions, summary, filters, cashiers, customers }) => {
 
     useEffect(
         () => setSelectedCashier(cashierFromFilters),
-        [cashierFromFilters]
+        [cashierFromFilters],
     );
     useEffect(
         () => setSelectedCustomer(customerFromFilters),
-        [customerFromFilters]
+        [customerFromFilters],
     );
     useEffect(() => {
         setFilterData({
@@ -177,7 +171,7 @@ const Sales = ({ transactions, summary, filters, cashiers, customers }) => {
             title: "Total Profit",
             value: formatCurrency(safeSummary.profit_total),
             description: `Rata-rata ${formatCurrency(
-                safeSummary.average_order
+                safeSummary.average_order,
             )}`,
             icon: <IconCoin />,
             gradient: "from-success-500 to-success-700",
@@ -255,7 +249,7 @@ const Sales = ({ transactions, summary, filters, cashiers, customers }) => {
                                         onChange={(e) =>
                                             handleChange(
                                                 "start_date",
-                                                e.target.value
+                                                e.target.value,
                                             )
                                         }
                                         className="w-full h-11 px-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-200 focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all"
@@ -271,7 +265,7 @@ const Sales = ({ transactions, summary, filters, cashiers, customers }) => {
                                         onChange={(e) =>
                                             handleChange(
                                                 "end_date",
-                                                e.target.value
+                                                e.target.value,
                                             )
                                         }
                                         className="w-full h-11 px-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-200 focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all"
@@ -288,7 +282,7 @@ const Sales = ({ transactions, summary, filters, cashiers, customers }) => {
                                         onChange={(e) =>
                                             handleChange(
                                                 "invoice",
-                                                e.target.value
+                                                e.target.value,
                                             )
                                         }
                                         className="w-full h-11 px-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-200 placeholder-slate-400 focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all"
@@ -396,12 +390,12 @@ const Sales = ({ transactions, summary, filters, cashiers, customers }) => {
                                             </td>
                                             <td className="px-4 py-4 text-right text-sm font-semibold text-slate-900 dark:text-white">
                                                 {formatCurrency(
-                                                    trx.grand_total ?? 0
+                                                    trx.grand_total ?? 0,
                                                 )}
                                             </td>
                                             <td className="px-4 py-4 text-right text-sm font-semibold text-success-600 dark:text-success-400">
                                                 {formatCurrency(
-                                                    trx.total_profit ?? 0
+                                                    trx.total_profit ?? 0,
                                                 )}
                                             </td>
                                         </tr>

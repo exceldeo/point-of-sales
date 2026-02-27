@@ -16,13 +16,7 @@ import Pagination from "@/Components/Common/Pagination";
 import Button from "@/Components/Common/Button";
 import hasAnyPermission, { permissionEnums } from "@/Utils/Permission";
 import Modal from "@/Components/Common/Modal";
-
-const formatCurrency = (value = 0) =>
-    new Intl.NumberFormat("id-ID", {
-        style: "currency",
-        currency: "IDR",
-        minimumFractionDigits: 0,
-    }).format(value);
+import formatCurrency from "@/Utils/formatCurrency";
 
 export default function Index({
     employees,
@@ -86,7 +80,9 @@ export default function Index({
                         </p>
                     </div>
 
-                    {hasAnyPermission([permissionEnums.EMPLOYEE_EDIT]) && (
+                    {hasAnyPermission([
+                        permissionEnums.EMPLOYEE_MANAGEMENT_CHANGE,
+                    ]) && (
                         <Button
                             type={"button"}
                             icon={

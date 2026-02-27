@@ -15,6 +15,7 @@ import {
 import Search from "@/Components/Common/Search";
 import Table from "@/Components/Common/Table";
 import Pagination from "@/Components/Common/Pagination";
+import hasAnyPermission, { permissionEnums } from "@/Utils/Permission";
 
 function SupplierCard({ supplier }) {
     return (
@@ -49,25 +50,33 @@ function SupplierCard({ supplier }) {
                     </div>
                 )}
             </div>
-
-            <div className="flex gap-2 pt-3 border-t border-slate-100 dark:border-slate-800">
-                <Link
-                    href={route("suppliers.edit", supplier.id)}
-                    className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg bg-warning-100 text-warning-600 hover:bg-warning-200 dark:bg-warning-900/50 dark:text-warning-400 text-sm font-medium transition-colors"
-                >
-                    <IconPencilCog size={16} />
-                    <span>Edit</span>
-                </Link>
-                <Button
-                    type={"delete"}
-                    icon={<IconTrash size={16} />}
-                    className={
-                        "flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg bg-danger-100 text-danger-600 hover:bg-danger-200 dark:bg-danger-900/50 dark:text-danger-400 text-sm font-medium"
-                    }
-                    url={route("suppliers.destroy", supplier.id)}
-                    label="Hapus"
-                />
-            </div>
+            {hasAnyPermission([
+                permissionEnums.SUPPLIERS_EDIT,
+                permissionEnums.SUPPLIERS_DELETE,
+            ]) && (
+                <div className="flex gap-2 pt-3 border-t border-slate-100 dark:border-slate-800">
+                    {hasAnyPermission([permissionEnums.SUPPLIERS_EDIT]) && (
+                        <Link
+                            href={route("suppliers.edit", supplier.id)}
+                            className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg bg-warning-100 text-warning-600 hover:bg-warning-200 dark:bg-warning-900/50 dark:text-warning-400 text-sm font-medium transition-colors"
+                        >
+                            <IconPencilCog size={16} />
+                            <span>Edit</span>
+                        </Link>
+                    )}
+                    {hasAnyPermission([permissionEnums.SUPPLIERS_DELETE]) && (
+                        <Button
+                            type={"delete"}
+                            icon={<IconTrash size={16} />}
+                            className={
+                                "flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg bg-danger-100 text-danger-600 hover:bg-danger-200 dark:bg-danger-900/50 dark:text-danger-400 text-sm font-medium"
+                            }
+                            url={route("suppliers.destroy", supplier.id)}
+                            label="Hapus"
+                        />
+                    )}
+                </div>
+            )}
         </div>
     );
 }
@@ -91,15 +100,19 @@ export default function Index({ suppliers }) {
                             pemasok terdaftar
                         </p>
                     </div>
-                    <Button
-                        type={"link"}
-                        icon={<IconCirclePlus size={18} strokeWidth={1.5} />}
-                        className={
-                            "bg-primary-500 hover:bg-primary-600 text-white shadow-lg shadow-primary-500/30"
-                        }
-                        label={"Tambah Pemasok"}
-                        href={route("suppliers.create")}
-                    />
+                    {hasAnyPermission([permissionEnums.SUPPLIERS_CREATE]) && (
+                        <Button
+                            type={"link"}
+                            icon={
+                                <IconCirclePlus size={18} strokeWidth={1.5} />
+                            }
+                            className={
+                                "bg-primary-500 hover:bg-primary-600 text-white shadow-lg shadow-primary-500/30"
+                            }
+                            label={"Tambah Pemasok"}
+                            href={route("suppliers.create")}
+                        />
+                    )}
                 </div>
             </div>
 
