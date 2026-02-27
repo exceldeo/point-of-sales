@@ -52,7 +52,7 @@ export default function Index({
 
     const updateEmployeeRole = async (e) => {
         e.preventDefault();
-        post(route("employees.permission-group.update"), {
+        post(route("employee-management.permission-group.update"), {
             onSuccess: () =>
                 setData({
                     selectedPermissionGroup: [],
@@ -166,7 +166,6 @@ export default function Index({
                         <Table.Tbody>
                             {employees.data.map((employee, i) => (
                                 <tr key={employee.id}>
-                                    {console.log(employee)}
                                     <Table.Td className="text-center">
                                         {++i +
                                             (employees.current_page - 1) *

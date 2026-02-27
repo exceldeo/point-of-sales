@@ -18,7 +18,7 @@ import Table from "@/Components/Common/Table";
 import Pagination from "@/Components/Common/Pagination";
 import { getProductImageUrl } from "@/Utils/imageUrl";
 import formatCurrency from "@/Utils/formatCurrency";
-import { permissionEnums } from "@/Utils/Permission";
+import hasAnyPermission, { permissionEnums } from "@/Utils/Permission";
 
 // Product Card for Grid View
 function ProductCard({ product, index, currentPage, perPage }) {

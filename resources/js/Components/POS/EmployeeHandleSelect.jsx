@@ -7,17 +7,14 @@ import {
     IconChevronDown,
     IconUserPlus,
 } from "@tabler/icons-react";
-import { CustomerHistoryButton } from "./CustomerHistoryPanel";
-import AddCustomerModal from "./AddCustomerModal";
 
-export default function CustomerSelect({
-    customers = [],
+export default function EmployeeHandleSelect({
+    employees = [],
     selected,
     onSelect,
-    placeholder = "Pilih pelanggan...",
+    placeholder = "Pilih karyawan...",
     error,
     label,
-    onCustomerAdded,
 }) {
     const [isOpen, setIsOpen] = useState(false);
     const [search, setSearch] = useState("");
@@ -25,11 +22,11 @@ export default function CustomerSelect({
     const containerRef = useRef(null);
     const inputRef = useRef(null);
 
-    // Filter customers by search
-    const filteredCustomers = customers.filter(
-        (customer) =>
-            customer.name.toLowerCase().includes(search.toLowerCase()) ||
-            customer.phone?.toLowerCase().includes(search.toLowerCase()),
+    // Filter employees by search
+    const filteredEmployees = employees.filter(
+        (employee) =>
+            employee.name.toLowerCase().includes(search.toLowerCase()) ||
+            employee.phone?.toLowerCase().includes(search.toLowerCase()),
     );
 
     // Close on click outside
@@ -54,17 +51,10 @@ export default function CustomerSelect({
         }
     }, [isOpen]);
 
-    const handleSelect = (customer) => {
-        onSelect(customer);
+    const handleSelect = (employee) => {
+        onSelect(employee);
         setIsOpen(false);
         setSearch("");
-    };
-
-    const handleAddCustomerSuccess = (newCustomer) => {
-        setShowAddModal(false);
-        // Reload page data to get updated customer list
-        router.reload({ only: ["customers"] });
-        onCustomerAdded?.(newCustomer);
     };
 
     return (
@@ -140,26 +130,6 @@ export default function CustomerSelect({
                             }`}
                         />
                     </button>
-
-                    {/* History Button - Show when customer is selected */}
-                    {selected && (
-                        <CustomerHistoryButton
-                            customerId={selected.id}
-                            customerName={selected.name}
-                        />
-                    )}
-
-                    {/* Add Customer Button */}
-                    <button
-                        type="button"
-                        onClick={() => setShowAddModal(true)}
-                        className="h-12 w-12 rounded-xl border-2 border-dashed border-primary-300 dark:border-primary-700
-                            text-primary-500 hover:bg-primary-50 dark:hover:bg-primary-950/30
-                            flex items-center justify-center transition-colors"
-                        title="Tambah pelanggan baru"
-                    >
-                        <IconUserPlus size={20} />
-                    </button>
                 </div>
 
                 {/* Error Message */}
@@ -188,23 +158,23 @@ export default function CustomerSelect({
                             </div>
                         </div>
 
-                        {/* Customer List */}
+                        {/* Employee List */}
                         <div className="max-h-60 overflow-y-auto scrollbar-thin">
-                            {filteredCustomers.length > 0 ? (
+                            {filteredEmployees.length > 0 ? (
                                 <ul>
-                                    {filteredCustomers.map((customer) => (
-                                        <li key={customer.id}>
+                                    {filteredEmployees.map((employee) => (
+                                        <li key={employee.id}>
                                             <button
                                                 type="button"
                                                 onClick={() =>
-                                                    handleSelect(customer)
+                                                    handleSelect(employee)
                                                 }
                                                 className={`
                                                     w-full flex items-center gap-3 px-4 py-3 text-left
                                                     transition-colors
                                                     ${
                                                         selected?.id ===
-                                                        customer.id
+                                                        employee.id
                                                             ? "bg-primary-50 dark:bg-primary-950/30"
                                                             : "hover:bg-slate-50 dark:hover:bg-slate-800"
                                                     }
@@ -215,18 +185,18 @@ export default function CustomerSelect({
                                                     w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0
                                                     ${
                                                         selected?.id ===
-                                                        customer.id
+                                                        employee.id
                                                             ? "bg-primary-500 text-white"
                                                             : "bg-slate-100 dark:bg-slate-800 text-slate-500"
                                                     }
                                                 `}
                                                 >
                                                     {selected?.id ===
-                                                    customer.id ? (
+                                                    employee.id ? (
                                                         <IconCheck size={16} />
                                                     ) : (
                                                         <span className="text-sm font-medium">
-                                                            {customer.name
+                                                            {employee.name
                                                                 .charAt(0)
                                                                 .toUpperCase()}
                                                         </span>
@@ -234,12 +204,7 @@ export default function CustomerSelect({
                                                 </div>
                                                 <div className="flex-1 min-w-0">
                                                     <p className="text-sm font-medium text-slate-800 dark:text-slate-200 truncate">
-                                                        {customer.name}
-                                                    </p>
-                                                    <p className="text-xs text-slate-500 dark:text-slate-400 truncate">
-                                                        {customer.phone ||
-                                                            customer.email ||
-                                                            "-"}
+                                                        {employee.name}
                                                     </p>
                                                 </div>
                                             </button>
@@ -253,31 +218,14 @@ export default function CustomerSelect({
                                         className="mx-auto mb-2 opacity-50"
                                     />
                                     <p className="text-sm">
-                                        Pelanggan tidak ditemukan
+                                        Pegawai tidak ditemukan
                                     </p>
-                                    <button
-                                        type="button"
-                                        onClick={() => {
-                                            setIsOpen(false);
-                                            setShowAddModal(true);
-                                        }}
-                                        className="mt-2 text-sm text-primary-500 hover:text-primary-600 font-medium"
-                                    >
-                                        + Tambah pelanggan baru
-                                    </button>
                                 </div>
                             )}
                         </div>
                     </div>
                 )}
             </div>
-
-            {/* Add Customer Modal */}
-            <AddCustomerModal
-                isOpen={showAddModal}
-                onClose={() => setShowAddModal(false)}
-                onSuccess={handleAddCustomerSuccess}
-            />
         </>
     );
 }

@@ -207,7 +207,7 @@ export default function Menu() {
                             active: url === "/employee-management",
                             icon: <IconBriefcase size={20} strokeWidth={1.5} />,
                             permissions: hasAnyPermission([
-                                permissionEnums.EMPLOYEE_ACCESS_MANAGEMENT_ACCESS,
+                                permissionEnums.EMPLOYEE_MANAGEMENT_ACCESS,
                             ]),
                         },
                     ],

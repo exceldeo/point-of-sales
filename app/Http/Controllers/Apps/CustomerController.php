@@ -19,7 +19,7 @@ class CustomerController extends Controller
         //get customers
         $customers = Customer::when(request()->search, function ($customers) {
             $customers = $customers->where('name', 'like', '%' . request()->search . '%');
-        })->latest()->paginate(5);
+        })->latest()->paginate(12)->withQueryString();
 
         //return inertia
         return Inertia::render('Customers/Index', [

@@ -20,6 +20,14 @@ export default function POSLayout({ children }) {
     const [currentTime, setCurrentTime] = useState(new Date());
     const [showMobileMenu, setShowMobileMenu] = useState(false);
 
+    const canAccessDashboard = hasAnyPermission([
+        permissionEnums.DASHBOARD_ACCESS,
+    ]);
+    const canAccessTransactions = hasAnyPermission([
+        permissionEnums.TRANSACTIONS_ACCESS,
+    ]);
+    const canAccessProfile = hasAnyPermission([permissionEnums.PROFILE_ACCESS]);
+
     // Update time every minute
     useEffect(() => {
         const timer = setInterval(() => {
@@ -99,7 +107,7 @@ export default function POSLayout({ children }) {
                 <div className="flex items-center gap-2 lg:gap-3">
                     {/* Quick Actions */}
                     <nav className="hidden lg:flex items-center gap-1">
-                        {hasAnyPermission([permissionEnums.DASHBOARD_ACCESS]) && (
+                        {canAccessDashboard && (
                             <Link
                                 href={route("dashboard")}
                                 className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100 dark:text-slate-400 dark:hover:text-white dark:hover:bg-slate-800 transition-colors"
@@ -177,7 +185,7 @@ export default function POSLayout({ children }) {
                         onClick={(e) => e.stopPropagation()}
                     >
                         <nav className="p-4 space-y-2">
-                            {hasAnyPermission([permissionEnums.DASHBOARD_ACCESS]) && (
+                            {canAccessDashboard && (
                                 <Link
                                     href={route("dashboard")}
                                     className="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800 transition-colors"
@@ -188,7 +196,7 @@ export default function POSLayout({ children }) {
                                     </span>
                                 </Link>
                             )}
-                            {hasAnyPermission([permissionEnums.TRANSACTIONS_ACCESS]) && (
+                            {canAccessTransactions && (
                                 <Link
                                     href={route("transactions.history")}
                                     className="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800 transition-colors"
@@ -199,7 +207,7 @@ export default function POSLayout({ children }) {
                                     </span>
                                 </Link>
                             )}
-                            {hasAnyPermission([permissionEnums.PROFILE_ACCESS]) && (
+                            {canAccessProfile && (
                                 <Link
                                     href={route("profile.edit")}
                                     className="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800 transition-colors"

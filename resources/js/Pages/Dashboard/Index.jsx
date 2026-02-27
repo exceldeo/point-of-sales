@@ -17,7 +17,7 @@ import {
     IconClock,
 } from "@tabler/icons-react";
 import hasAnyPermission, { permissionEnums } from "@/Utils/Permission";
-import { formatCurrency } from "@/Utils/formatCurrency";
+import formatCurrency from "@/Utils/formatCurrency";
 
 // Stat Card Component
 function StatCard({ title, value, subtitle, icon: Icon, gradient, trend }) {

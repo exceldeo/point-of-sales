@@ -30,6 +30,7 @@ import {
     IconCreditCard,
     IconQrcode,
 } from "@tabler/icons-react";
+import EmployeeHandleSelect from "@/Components/POS/EmployeeHandleSelect";
 
 const formatPrice = (value = 0) =>
     value.toLocaleString("id-ID", {
@@ -423,7 +424,7 @@ export default function Index({
                     style={{ height: "calc(100vh - 4rem)" }}
                 >
                     {/* Customer Select - Fixed */}
-                    <div className="p-3 border-b border-slate-200 dark:border-slate-800 flex-shrink-0">
+                    <div className="p-3 border-b border-slate-200 dark:border-slate-800 flex-shrink-0 space-y-3">
                         <CustomerSelect
                             customers={customers}
                             selected={selectedCustomer}
@@ -433,31 +434,14 @@ export default function Index({
                             label="Pelanggan"
                         />
 
-                        <div className="mt-3">
-                            <label className="flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                                <IconUser size={14} />
-                                Assign User (Opsional)
-                            </label>
-                            <select
-                                value={selectedUserId}
-                                onChange={(e) =>
-                                    setSelectedUserId(e.target.value)
-                                }
-                                className="w-full h-10 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 text-sm text-slate-700 dark:text-slate-200 focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500"
-                            >
-                                <option value="">Tidak dipilih</option>
-                                {employees.map((user) => (
-                                    <option key={user.id} value={user.id}>
-                                        {user.name}
-                                    </option>
-                                ))}
-                            </select>
-                            {errors?.user_id && (
-                                <p className="mt-1 text-xs text-danger-500">
-                                    {errors.user_id}
-                                </p>
-                            )}
-                        </div>
+                        <EmployeeHandleSelect
+                            employees={employees}
+                            selected={selectedUserId}
+                            onSelect={(id) => setSelectedUserId(id)}
+                            placeholder="Pilih karyawan..."
+                            error={errors?.user_id}
+                            label="Karyawan (Opsional)"
+                        />
                     </div>
 
                     {/* Held Transactions - Show if any */}
