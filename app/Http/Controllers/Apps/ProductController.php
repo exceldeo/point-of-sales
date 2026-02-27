@@ -46,11 +46,13 @@ class ProductController extends Controller
             ->orderBy('name')
             ->get();
         $employees = (new EmployeeManagementController())->getEmployees();
+        $employeeRoles = (new EmployeeManagementController())->getEmployeeRoles();
 
         //return inertia
         return Inertia::render('Products/Create', [
             'categories' => $categories,
             'employees' => $employees,
+            'employeeRoles' => $employeeRoles,
         ]);
     }
 
@@ -124,11 +126,13 @@ class ProductController extends Controller
         $product->load(['commissionUsers' => fn($query) => $query->select('users.id', 'name', 'email')]);
 
         $employees = (new EmployeeManagementController())->getEmployees();
+        $employeeRoles = (new EmployeeManagementController())->getEmployeeRoles();
 
         return Inertia::render('Products/Edit', [
             'product' => $product,
             'categories' => $categories,
             'employees' => $employees,
+            'employeeRoles' => $employeeRoles,
         ]);
     }
 
@@ -226,4 +230,6 @@ class ProductController extends Controller
             ])
             ->toArray();
     }
+
+    
 }

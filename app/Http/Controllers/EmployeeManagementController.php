@@ -93,4 +93,15 @@ class EmployeeManagementController extends Controller
 
         return $employees;
     }
+
+    public function getEmployeeRoles()
+    {
+        $employeeRoles = EmployeeRole::query()
+            ->with('permissionGroup')
+            ->select('id', 'permission_group_id')
+            ->get();
+            
+
+        return $employeeRoles;
+    }
 }
