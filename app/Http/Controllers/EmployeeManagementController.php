@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\EmployeeRole;
+use App\Models\LogCommission;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -100,8 +101,26 @@ class EmployeeManagementController extends Controller
             ->with('permissionGroup')
             ->select('id', 'permission_group_id')
             ->get();
-            
 
         return $employeeRoles;
+    }
+
+    public function withdrawCommission(User $employee)
+    {
+        $outstandingCommission = (int) $employee->logCommissions()->sum('nominal');
+
+        if ($outstandingCommission <= 0) {
+            return back()->withErrors([
+                'withdraw' => 'Komisi karyawan tidak tersedia untuk withdraw.',
+            ]);
+        }
+
+        LogCommission::query()->create([
+            'user_id' => $employee->id,
+            'nominal' => $outstandingCommission * -1,
+            'description' => 'Withdraw komisi karyawan',
+        ]);
+
+        return back();
     }
 }

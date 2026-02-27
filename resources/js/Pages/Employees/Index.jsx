@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import AppLayout from "@/Layouts/AppLayout";
-import { Head, useForm, usePage } from "@inertiajs/react";
+import { Head, router, useForm, usePage } from "@inertiajs/react";
 import {
     IconCirclePlus,
     IconBriefcase,
@@ -9,6 +9,7 @@ import {
     IconShield,
     IconUserShield,
     IconPencilCheck,
+    IconCash,
 } from "@tabler/icons-react";
 import ListBox from "@/Components/Common/ListBox";
 import Table from "@/Components/Common/Table";
@@ -17,6 +18,7 @@ import Button from "@/Components/Common/Button";
 import hasAnyPermission, { permissionEnums } from "@/Utils/Permission";
 import Modal from "@/Components/Common/Modal";
 import formatCurrency from "@/Utils/formatCurrency";
+import Swal from "sweetalert2";
 
 export default function Index({
     employees,
@@ -58,6 +60,69 @@ export default function Index({
                     selectedPermissionGroup: [],
                     isOpen: false,
                 }),
+        });
+    };
+
+    const onWithdraw = (employeeId) => {
+        const employee = employees.data.find((item) => item.id === employeeId);
+        const totalCommission = (employee?.log_commissions || []).reduce(
+            (sum, item) => sum + item.nominal,
+            0,
+        );
+
+        // confirmation alert
+        Swal.fire({
+            title: "Konfirmasi",
+            text: `Apakah Anda yakin Withdraw komisi ${employee?.name} sebesar ${formatCurrency(totalCommission)}?`,
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Ya, withdraw",
+            cancelButtonText: "Batal",
+        }).then((result) => {
+            if (!result.isConfirmed) return;
+
+            if (totalCommission <= 0) {
+                Swal.fire({
+                    icon: "info",
+                    title: "Komisi karyawan tidak tersedia untuk withdraw.",
+                    showConfirmButton: false,
+                    timer: 1500,
+                });
+                return;
+            }
+
+            Swal.fire({
+                title: "Processing",
+                text: "Mohon tunggu...",
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                },
+            });
+
+            router.post(
+                route("employee-management.withdraw", employeeId),
+                {},
+                {
+                    preserveScroll: true,
+                    onSuccess: () => {
+                        Swal.fire({
+                            icon: "success",
+                            title: "Withdraw komisi berhasil.",
+                            showConfirmButton: false,
+                            timer: 1500,
+                        });
+                    },
+                    onError: () => {
+                        Swal.fire({
+                            icon: "error",
+                            title: "Withdraw komisi gagal.",
+                            showConfirmButton: false,
+                            timer: 1500,
+                        });
+                    },
+                },
+            );
         });
     };
 
@@ -160,7 +225,9 @@ export default function Index({
                                 <Table.Th>Nama</Table.Th>
                                 <Table.Th>Email</Table.Th>
                                 <Table.Th>Total Komisi</Table.Th>
-                                <Table.Th className="w-40"></Table.Th>
+                                <Table.Th className="w-40 text-center">
+                                    Action
+                                </Table.Th>
                             </tr>
                         </Table.Thead>
                         <Table.Tbody>
@@ -187,6 +254,17 @@ export default function Index({
                                                 ),
                                             )}
                                         </span>
+                                    </Table.Td>
+                                    <Table.Td>
+                                        <button
+                                            onClick={() =>
+                                                onWithdraw(employee.id)
+                                            }
+                                            className="inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors"
+                                        >
+                                            <IconCash size={16} />
+                                            Withdraw
+                                        </button>
                                     </Table.Td>
                                 </tr>
                             ))}

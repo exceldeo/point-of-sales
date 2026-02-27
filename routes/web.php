@@ -52,6 +52,9 @@ Route::group(['prefix' => '', 'middleware' => ['auth']], function () {
     Route::put('/employees/permission-group', [EmployeeManagementController::class, 'updatePermissionGroup'])
         ->middleware('permission:'.PermissionEnums::EMPLOYEE_MANAGEMENT_CHANGE->value)
         ->name('employee-management.permission-group.update');
+    Route::post('/employees/{employee}/withdraw', [EmployeeManagementController::class, 'withdrawCommission'])
+        ->middleware('permission:'.PermissionEnums::EMPLOYEE_MANAGEMENT_ACCESS->value)
+        ->name('employee-management.withdraw');
 
     Route::resource('categories', CategoryController::class)
         ->middlewareFor(['index', 'show'], 'permission:'.PermissionEnums::CATEGORIES_ACCESS->value)
