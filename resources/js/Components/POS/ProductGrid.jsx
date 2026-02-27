@@ -1,9 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
 import {
     IconShoppingBag,
     IconPhoto,
-    IconMinus,
-    IconPlus,
+    IconLayoutGrid,
+    IconList,
 } from "@tabler/icons-react";
 import { getProductImageUrl } from "@/Utils/imageUrl";
 
@@ -15,9 +15,70 @@ const formatPrice = (value = 0) =>
     });
 
 // Single Product Card
-function ProductCard({ product, onAddToCart, isAdding }) {
+function ProductCard({ product, onAddToCart, isAdding, view = "grid" }) {
     const hasStock = product.stock > 0;
     const lowStock = product.stock > 0 && product.stock <= 5;
+
+    if (view === "list") {
+        return (
+            <button
+                onClick={() => hasStock && onAddToCart(product)}
+                disabled={!hasStock || isAdding}
+                className={`
+                    group relative w-full flex items-center gap-3 bg-white dark:bg-slate-900
+                    rounded-2xl border border-slate-200 dark:border-slate-800 p-3
+                    transition-all duration-200
+                    ${
+                        hasStock
+                            ? "hover:border-primary-300 dark:hover:border-primary-700 hover:shadow-md active:scale-[0.99] cursor-pointer"
+                            : "opacity-60 cursor-not-allowed"
+                    }
+                `}
+            >
+                <div className="relative w-16 h-16 rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-800 flex-shrink-0">
+                    {product.image ? (
+                        <img
+                            src={getProductImageUrl(product.image)}
+                            alt={product.title}
+                            className="w-full h-full object-cover"
+                            loading="lazy"
+                        />
+                    ) : (
+                        <div className="w-full h-full flex items-center justify-center">
+                            <IconPhoto
+                                size={24}
+                                className="text-slate-300 dark:text-slate-600"
+                            />
+                        </div>
+                    )}
+                </div>
+
+                <div className="flex-1 min-w-0 text-left">
+                    <h3 className="text-sm font-medium text-slate-800 dark:text-slate-200 truncate">
+                        {product.title}
+                    </h3>
+                    <p className="mt-1 text-base font-bold text-primary-600 dark:text-primary-400">
+                        {formatPrice(product.sell_price)}
+                    </p>
+                    {lowStock && (
+                        <p className="mt-1 text-xs font-medium text-warning-600 dark:text-warning-400">
+                            Sisa {product.stock}
+                        </p>
+                    )}
+                </div>
+
+                {!hasStock ? (
+                    <span className="px-3 py-1 bg-danger-500 text-white text-xs font-semibold rounded-full">
+                        Habis
+                    </span>
+                ) : (
+                    <span className="text-xs font-semibold text-primary-600 dark:text-primary-400">
+                        + Tambah
+                    </span>
+                )}
+            </button>
+        );
+    }
 
     return (
         <button
@@ -111,6 +172,37 @@ function CategoryTab({ category, isActive, onClick }) {
     );
 }
 
+function ViewModeToggle({ viewMode, onChange }) {
+    return (
+        <div className="flex items-center gap-1 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 p-1">
+            <button
+                onClick={() => onChange("grid")}
+                className={`h-8 w-8 rounded-lg flex items-center justify-center transition-colors ${
+                    viewMode === "grid"
+                        ? "bg-white dark:bg-slate-800 text-primary-600 dark:text-primary-400"
+                        : "text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
+                }`}
+                aria-label="Tampilan grid"
+                title="Tampilan grid"
+            >
+                <IconLayoutGrid size={16} />
+            </button>
+            <button
+                onClick={() => onChange("list")}
+                className={`h-8 w-8 rounded-lg flex items-center justify-center transition-colors ${
+                    viewMode === "list"
+                        ? "bg-white dark:bg-slate-800 text-primary-600 dark:text-primary-400"
+                        : "text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
+                }`}
+                aria-label="Tampilan list"
+                title="Tampilan list"
+            >
+                <IconList size={16} />
+            </button>
+        </div>
+    );
+}
+
 // Search Input
 function SearchInput({
     value,
@@ -164,6 +256,8 @@ export default function ProductGrid({
     addingProductId,
     searchInputRef,
 }) {
+    const [viewMode, setViewMode] = useState("grid");
+
     // Filter products by category and search
     const filteredProducts = products.filter((product) => {
         const matchesCategory =
@@ -190,37 +284,63 @@ export default function ProductGrid({
             </div>
 
             {/* Category Tabs */}
-            <div className="px-4 py-3 border-b border-slate-200 dark:border-slate-800 overflow-x-auto scrollbar-hide">
-                <div className="flex gap-2">
-                    <CategoryTab
-                        category={{ id: null, name: "Semua" }}
-                        isActive={!selectedCategory}
-                        onClick={() => onCategoryChange(null)}
+            <div className="px-4 py-3 border-b border-slate-200 dark:border-slate-800">
+                <div className="flex items-center justify-between gap-3">
+                    <div className="overflow-x-auto scrollbar-hide">
+                        <div className="flex gap-2">
+                            <CategoryTab
+                                category={{ id: null, name: "Semua" }}
+                                isActive={!selectedCategory}
+                                onClick={() => onCategoryChange(null)}
+                            />
+                            {categories.map((category) => (
+                                <CategoryTab
+                                    key={category.id}
+                                    category={category}
+                                    isActive={selectedCategory === category.id}
+                                    onClick={() =>
+                                        onCategoryChange(category.id)
+                                    }
+                                />
+                            ))}
+                        </div>
+                    </div>
+
+                    <ViewModeToggle
+                        viewMode={viewMode}
+                        onChange={setViewMode}
                     />
-                    {categories.map((category) => (
-                        <CategoryTab
-                            key={category.id}
-                            category={category}
-                            isActive={selectedCategory === category.id}
-                            onClick={() => onCategoryChange(category.id)}
-                        />
-                    ))}
                 </div>
             </div>
 
             {/* Products Grid */}
             <div className="flex-1 overflow-y-auto p-4 scrollbar-thin">
                 {filteredProducts.length > 0 ? (
-                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
-                        {filteredProducts.map((product) => (
-                            <ProductCard
-                                key={product.id}
-                                product={product}
-                                onAddToCart={onAddToCart}
-                                isAdding={addingProductId === product.id}
-                            />
-                        ))}
-                    </div>
+                    viewMode === "grid" ? (
+                        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
+                            {filteredProducts.map((product) => (
+                                <ProductCard
+                                    key={product.id}
+                                    product={product}
+                                    onAddToCart={onAddToCart}
+                                    isAdding={addingProductId === product.id}
+                                    view={viewMode}
+                                />
+                            ))}
+                        </div>
+                    ) : (
+                        <div className="space-y-3">
+                            {filteredProducts.map((product) => (
+                                <ProductCard
+                                    key={product.id}
+                                    product={product}
+                                    onAddToCart={onAddToCart}
+                                    isAdding={addingProductId === product.id}
+                                    view={viewMode}
+                                />
+                            ))}
+                        </div>
+                    )
                 ) : (
                     <div className="h-full flex flex-col items-center justify-center text-slate-400 dark:text-slate-600">
                         <IconShoppingBag
