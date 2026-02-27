@@ -1,6 +1,0 @@
-import{c as e}from"./createReactComponent-C8kz4Mkw.js";/**
- * @license @tabler/icons-react v3.5.0 - MIT
- *
- * This source code is licensed under the MIT license.
- * See the LICENSE file in the root directory of this source tree.
- */var t=e("outline","trending-up","IconTrendingUp",[["path",{d:"M3 17l6 -6l4 4l8 -8",key:"svg-0"}],["path",{d:"M14 7l7 0l0 7",key:"svg-1"}]]);export{t as I};
