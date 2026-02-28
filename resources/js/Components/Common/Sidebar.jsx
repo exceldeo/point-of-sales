@@ -76,7 +76,7 @@ export default function Sidebar({ sidebarOpen }) {
             <nav className="flex-1 overflow-y-auto py-3 scrollbar-thin">
                 {menuNavigation.map((section, index) => {
                     const hasPermission = section.details.some(
-                        (detail) => detail.permissions === true
+                        (detail) => detail.permissions === true,
                     );
                     if (!hasPermission) return null;
 
@@ -111,6 +111,7 @@ export default function Sidebar({ sidebarOpen }) {
                                                 data={detail.subdetails}
                                                 access={detail.permissions}
                                                 sidebarOpen={sidebarOpen}
+                                                isActive={detail.active}
                                             />
                                         );
                                     }
