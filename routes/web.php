@@ -114,6 +114,9 @@ Route::group(['prefix' => '', 'middleware' => ['auth']], function () {
     //route transaction destroyCart
     Route::delete('/transactions/{cart_id}/destroyCart', [TransactionController::class, 'destroyCart'])->middleware('permission:'.PermissionEnums::TRANSACTIONS_ACCESS->value)->name('transactions.destroyCart');
 
+    //route transaction clearCart
+    Route::delete('/transactions/clearCart', [TransactionController::class, 'clearCart'])->middleware('permission:'.PermissionEnums::TRANSACTIONS_ACCESS->value)->name('transactions.clearCart');
+
     //route transaction updateCart
     Route::patch('/transactions/{cart_id}/updateCart', [TransactionController::class, 'updateCart'])->middleware('permission:'.PermissionEnums::TRANSACTIONS_ACCESS->value)->name('transactions.updateCart');
 

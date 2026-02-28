@@ -203,6 +203,21 @@ class TransactionController extends Controller
     }
 
     /**
+     * clearCart
+     *
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function clearCart()
+    {
+        Cart::query()
+            ->where('cashier_id', auth()->user()->id)
+            ->active()
+            ->delete();
+
+        return back()->with('success', 'Cart cleared successfully');
+    }
+
+    /**
      * updateCart - Update cart item quantity
      *
      * @param  mixed $request
