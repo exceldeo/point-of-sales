@@ -22,6 +22,7 @@ export default function NumpadModal({
     minValue = 0,
     maxValue = 999999999,
     isCurrency = false,
+    totalTransaction = 0, // For currency mode, to prevent exceeding total
 }) {
     const [value, setValue] = useState(String(initialValue || ""));
 
@@ -63,7 +64,7 @@ export default function NumpadModal({
                 return newValue;
             });
         },
-        [maxValue]
+        [maxValue],
     );
 
     const handleBackspace = useCallback(() => {
@@ -90,7 +91,7 @@ export default function NumpadModal({
                 setValue(String(newValue));
             }
         },
-        [value, maxValue]
+        [value, maxValue],
     );
 
     const formatDisplay = (val) => {
@@ -131,6 +132,14 @@ export default function NumpadModal({
                     >
                         <IconX size={20} />
                     </button>
+                </div>
+                <div className="px-5 py-2 text-sm flex justify-between text-slate-500 dark:text-slate-400 border-b border-slate-100 dark:border-slate-800">
+                    <div>Total Transaksi:</div>
+                    <div>
+                        <span className="font-semibold text-slate-800 dark:text-white">
+                            {formatDisplay(totalTransaction)}
+                        </span>
+                    </div>
                 </div>
 
                 {/* Display */}

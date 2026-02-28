@@ -70,6 +70,7 @@ export default function Index({
     const [mobileView, setMobileView] = useState("products"); // 'products' | 'cart'
     const [numpadOpen, setNumpadOpen] = useState(false);
     const [showShortcuts, setShowShortcuts] = useState(false);
+    const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
 
     // Ref for search input to enable keyboard focus
     const searchInputRef = useRef(null);
@@ -200,6 +201,8 @@ export default function Index({
         const nextValue = String(value);
         cashInputRef.current = nextValue;
         setCashInput(nextValue);
+        setNumpadOpen(false);
+        handleOpenPaymentModal();
     }, []);
 
     // Handle hold transaction
@@ -252,7 +255,7 @@ export default function Index({
                     break;
                 case "F2":
                     e.preventDefault();
-                    handleSubmitTransaction();
+                    handleOpenPaymentModal();
                     break;
                 case "F3":
                     e.preventDefault();
@@ -267,6 +270,7 @@ export default function Index({
                 case "Escape":
                     setNumpadOpen(false);
                     setShowShortcuts(false);
+                    setIsPaymentModalOpen(false);
                     setSearchQuery("");
                     break;
             }
@@ -329,6 +333,7 @@ export default function Index({
                     setSelectedCustomer(null);
                     setSelectedUserId("");
                     setPaymentMethod(defaultPaymentGateway ?? "cash");
+                    setIsPaymentModalOpen(false);
                     setIsSubmitting(false);
                     carts = [];
                     toast.success("Transaksi berhasil!");
@@ -339,6 +344,15 @@ export default function Index({
                 },
             },
         );
+    };
+
+    const handleOpenPaymentModal = () => {
+        if (carts.length === 0) {
+            toast.error("Keranjang masih kosong");
+            return;
+        }
+
+        setIsPaymentModalOpen(true);
     };
 
     // Filter products including out of stock
@@ -466,7 +480,7 @@ export default function Index({
                             </div>
                         )} */}
 
-                        <div className="p-3 border-b border-slate-200 dark:border-slate-800">
+                        <div className="p-3 h-full flex flex-col">
                             <div className="flex items-center justify-between mb-3">
                                 <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-2">
                                     <IconShoppingCart size={16} />
@@ -480,7 +494,7 @@ export default function Index({
                             </div>
 
                             {carts.length > 0 ? (
-                                <div className="space-y-2 max-h-[200px] overflow-y-auto pr-1">
+                                <div className="space-y-2 overflow-y-auto pr-1">
                                     {carts.map((item) => (
                                         <div
                                             key={item.id}
@@ -576,63 +590,117 @@ export default function Index({
                                 </div>
                             )}
                         </div>
+                    </div>
 
-                        {/* Payment Details - Scrollable */}
-                        <div className="p-3 space-y-4">
-                            {/* Payment Method Selection */}
-                            <div>
-                                <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-2">
-                                    Metode Pembayaran
-                                </label>
-                                <div className="grid grid-cols-2 gap-2">
-                                    {paymentOptions.map((method) => (
-                                        <button
-                                            key={method.value}
-                                            onClick={() =>
-                                                setPaymentMethod(method.value)
-                                            }
-                                            className={`p-3 rounded-xl border-2 transition-all flex items-center gap-2 ${
+                    {/* Summary & Submit - Fixed at bottom */}
+                    <div className="flex-shrink-0 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/80 p-3">
+                        {/* Summary Row */}
+                        <div className="flex justify-between items-center mb-2 text-sm">
+                            <span className="text-slate-500">Subtotal</span>
+                            <span className="font-medium">
+                                {formatPrice(subtotal)}
+                            </span>
+                        </div>
+                        {discount > 0 && (
+                            <div className="flex justify-between items-center mb-2 text-sm">
+                                <span className="text-slate-500">Diskon</span>
+                                <span className="text-danger-500">
+                                    -{formatPrice(discount)}
+                                </span>
+                            </div>
+                        )}
+                        <div className="flex justify-between items-center mb-3">
+                            <span className="font-semibold text-slate-800 dark:text-white">
+                                Total
+                            </span>
+                            <span className="text-xl font-bold text-primary-600 dark:text-primary-400">
+                                {formatPrice(payable)}
+                            </span>
+                        </div>
+
+                        {/* Submit Button - Always visible */}
+                        <button
+                            onClick={handleOpenPaymentModal}
+                            disabled={!carts.length || isSubmitting}
+                            className={`w-full h-12 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 transition-all ${
+                                carts.length
+                                    ? "bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white shadow-lg shadow-primary-500/30"
+                                    : "bg-slate-200 dark:bg-slate-800 text-slate-400 cursor-not-allowed"
+                            }`}
+                        >
+                            <>
+                                <IconReceipt size={18} />
+                                <span>
+                                    {!carts.length
+                                        ? "Keranjang Kosong"
+                                        : "Create Order"}
+                                </span>
+                            </>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            {isPaymentModalOpen && (
+                <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
+                    <div
+                        className="absolute inset-0 bg-slate-900/60"
+                        onClick={() => setIsPaymentModalOpen(false)}
+                    />
+                    <div className="relative w-full sm:max-w-lg bg-white dark:bg-slate-900 rounded-t-2xl sm:rounded-2xl shadow-xl p-4 sm:p-6 space-y-4 max-h-[90vh] overflow-y-auto">
+                        <h3 className="text-lg font-bold text-slate-800 dark:text-white flex items-center gap-2">
+                            <IconReceipt size={22} />
+                            Konfirmasi Transaksi
+                        </h3>
+
+                        <div>
+                            <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-2">
+                                Metode Pembayaran
+                            </label>
+                            <div className="grid grid-cols-2 gap-2">
+                                {paymentOptions.map((method) => (
+                                    <button
+                                        key={method.value}
+                                        onClick={() =>
+                                            setPaymentMethod(method.value)
+                                        }
+                                        className={`p-3 rounded-xl border-2 transition-all flex items-center gap-2 ${
+                                            paymentMethod === method.value
+                                                ? "border-primary-500 bg-primary-50 dark:bg-primary-950/30"
+                                                : "border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600"
+                                        }`}
+                                    >
+                                        <div
+                                            className={`w-8 h-8 rounded-lg flex items-center justify-center ${
                                                 paymentMethod === method.value
-                                                    ? "border-primary-500 bg-primary-50 dark:bg-primary-950/30"
-                                                    : "border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600"
+                                                    ? "bg-primary-500 text-white"
+                                                    : "bg-slate-100 dark:bg-slate-800 text-slate-500"
                                             }`}
                                         >
-                                            <div
-                                                className={`w-8 h-8 rounded-lg flex items-center justify-center ${
-                                                    paymentMethod ===
-                                                    method.value
-                                                        ? "bg-primary-500 text-white"
-                                                        : "bg-slate-100 dark:bg-slate-800 text-slate-500"
-                                                }`}
-                                            >
-                                                {method.value === "cash" ? (
-                                                    <IconCash size={16} />
-                                                ) : method.value ===
-                                                  "qrcode" ? (
-                                                    <IconQrcode size={16} />
-                                                ) : (
-                                                    <IconCreditCard size={16} />
-                                                )}
-                                            </div>
-                                            <div className="text-left">
-                                                <p
-                                                    className={`text-sm font-semibold ${
-                                                        paymentMethod ===
-                                                        method.value
-                                                            ? "text-primary-700 dark:text-primary-300"
-                                                            : "text-slate-700 dark:text-slate-300"
-                                                    }`}
-                                                >
-                                                    {method.label}
-                                                </p>
-                                            </div>
-                                        </button>
-                                    ))}
-                                </div>
+                                            {method.value === "cash" ? (
+                                                <IconCash size={16} />
+                                            ) : method.value === "qrcode" ? (
+                                                <IconQrcode size={16} />
+                                            ) : (
+                                                <IconCreditCard size={16} />
+                                            )}
+                                        </div>
+                                        <p
+                                            className={`text-sm font-semibold ${
+                                                paymentMethod === method.value
+                                                    ? "text-primary-700 dark:text-primary-300"
+                                                    : "text-slate-700 dark:text-slate-300"
+                                            }`}
+                                        >
+                                            {method.label}
+                                        </p>
+                                    </button>
+                                ))}
                             </div>
+                        </div>
 
-                            {/* Quick Amounts - Only for cash */}
-                            {paymentMethod === "cash" && (
+                        {paymentMethod === "cash" && (
+                            <div className="space-y-3">
                                 <div>
                                     <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-2">
                                         Nominal Cepat
@@ -662,37 +730,7 @@ export default function Index({
                                         )}
                                     </div>
                                 </div>
-                            )}
 
-                            {/* Discount Input */}
-                            <div>
-                                <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-2">
-                                    Diskon (Rp)
-                                </label>
-                                <div className="relative">
-                                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm">
-                                        Rp
-                                    </span>
-                                    <input
-                                        type="text"
-                                        inputMode="numeric"
-                                        value={discountInput}
-                                        onChange={(e) =>
-                                            setDiscountInput(
-                                                e.target.value.replace(
-                                                    /[^\d]/g,
-                                                    "",
-                                                ),
-                                            )
-                                        }
-                                        placeholder="0"
-                                        className="w-full h-10 pl-10 pr-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-sm focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500"
-                                    />
-                                </div>
-                            </div>
-
-                            {/* Cash Input - Only for cash */}
-                            {paymentMethod === "cash" && (
                                 <div>
                                     <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-2">
                                         Jumlah Bayar (Rp)
@@ -720,85 +758,99 @@ export default function Index({
                                         />
                                     </div>
                                 </div>
-                            )}
-                        </div>
-                    </div>
-
-                    {/* Summary & Submit - Fixed at bottom */}
-                    <div className="flex-shrink-0 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/80 p-3">
-                        {/* Summary Row */}
-                        <div className="flex justify-between items-center mb-2 text-sm">
-                            <span className="text-slate-500">Subtotal</span>
-                            <span className="font-medium">
-                                {formatPrice(subtotal)}
-                            </span>
-                        </div>
-                        {discount > 0 && (
-                            <div className="flex justify-between items-center mb-2 text-sm">
-                                <span className="text-slate-500">Diskon</span>
-                                <span className="text-danger-500">
-                                    -{formatPrice(discount)}
-                                </span>
                             </div>
                         )}
-                        <div className="flex justify-between items-center mb-3">
-                            <span className="font-semibold text-slate-800 dark:text-white">
-                                Total
-                            </span>
-                            <span className="text-xl font-bold text-primary-600 dark:text-primary-400">
-                                {formatPrice(payable)}
-                            </span>
+                        {/* Payment Details - Scrollable */}
+                        <div className="">
+                            {/* Discount Input */}
+                            <div>
+                                <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-2">
+                                    Diskon (Opsional)
+                                </label>
+                                <div className="relative">
+                                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm">
+                                        Rp
+                                    </span>
+                                    <input
+                                        type="text"
+                                        inputMode="numeric"
+                                        value={discountInput}
+                                        onChange={(e) =>
+                                            setDiscountInput(
+                                                e.target.value.replace(
+                                                    /[^\d]/g,
+                                                    "",
+                                                ),
+                                            )
+                                        }
+                                        placeholder="0"
+                                        className="w-full h-10 pl-10 pr-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-base font-semibold focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500"
+                                    />
+                                </div>
+                            </div>
                         </div>
 
-                        {paymentMethod === "cash" &&
-                            cash >= payable &&
-                            payable > 0 && (
-                                <div className="flex justify-between items-center mb-3 p-2 rounded-lg bg-success-50 dark:bg-success-950/30">
-                                    <span className="text-sm text-success-700 dark:text-success-400">
-                                        Kembalian
+                        <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 space-y-2">
+                            {discount > 0 && (
+                                <div className="flex justify-between text-sm">
+                                    <span className="text-slate-500">
+                                        Diskon
                                     </span>
-                                    <span className="font-bold text-success-600">
-                                        {formatPrice(cash - payable)}
+                                    <span className="text-danger-500">
+                                        -{formatPrice(discount)}
                                     </span>
                                 </div>
                             )}
 
-                        {/* Submit Button - Always visible */}
-                        <button
-                            onClick={handleSubmitTransaction}
-                            disabled={
-                                !carts.length ||
-                                (paymentMethod === "cash" && cash < payable) ||
-                                isSubmitting
-                            }
-                            className={`w-full h-12 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 transition-all ${
-                                carts.length &&
-                                (paymentMethod !== "cash" || cash >= payable)
-                                    ? "bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white shadow-lg shadow-primary-500/30"
-                                    : "bg-slate-200 dark:bg-slate-800 text-slate-400 cursor-not-allowed"
-                            }`}
-                        >
-                            {isSubmitting ? (
-                                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                            ) : (
-                                <>
-                                    <IconReceipt size={18} />
-                                    <span>
-                                        {!carts.length
-                                            ? "Keranjang Kosong"
-                                            : paymentMethod === "cash" &&
-                                                cash < payable
-                                              ? `Kurang ${formatPrice(
-                                                    payable - cash,
-                                                )}`
-                                              : "Selesaikan Transaksi"}
-                                    </span>
-                                </>
-                            )}
-                        </button>
+                            <div className="flex justify-between text-sm">
+                                <span className="text-slate-500">Total</span>
+                                <span className="font-semibold text-slate-800 dark:text-white">
+                                    {formatPrice(payable)}
+                                </span>
+                            </div>
+                            {paymentMethod === "cash" &&
+                                cash >= payable &&
+                                payable > 0 && (
+                                    <div className="flex justify-between text-sm">
+                                        <span className="text-success-700 dark:text-success-400">
+                                            Kembalian
+                                        </span>
+                                        <span className="font-bold text-success-600">
+                                            {formatPrice(cash - payable)}
+                                        </span>
+                                    </div>
+                                )}
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-2 pt-1">
+                            <button
+                                onClick={() => setIsPaymentModalOpen(false)}
+                                className="h-11 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 font-semibold"
+                            >
+                                Batal
+                            </button>
+                            <button
+                                onClick={handleSubmitTransaction}
+                                disabled={
+                                    isSubmitting ||
+                                    (paymentMethod === "cash" && cash < payable)
+                                }
+                                className={`h-11 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 transition-all ${
+                                    paymentMethod !== "cash" || cash >= payable
+                                        ? "bg-primary-500 hover:bg-primary-600 text-white"
+                                        : "bg-slate-200 dark:bg-slate-800 text-slate-400 cursor-not-allowed"
+                                }`}
+                            >
+                                {isSubmitting ? (
+                                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                ) : (
+                                    "Create Transaction"
+                                )}
+                            </button>
+                        </div>
                     </div>
                 </div>
-            </div>
+            )}
 
             {/* Numpad Modal */}
             <NumpadModal
@@ -808,6 +860,7 @@ export default function Index({
                 title="Jumlah Bayar"
                 initialValue={Number(cashInput) || 0}
                 isCurrency={true}
+                totalTransaction={payable}
             />
 
             {/* Keyboard Shortcuts Help */}
@@ -825,7 +878,7 @@ export default function Index({
                         <div className="space-y-3">
                             {[
                                 ["F1", "Buka Numpad"],
-                                ["F2", "Selesaikan Transaksi"],
+                                ["F2", "Buka Konfirmasi Transaksi"],
                                 ["F3", "Toggle Produk/Keranjang"],
                                 ["F4", "Tampilkan Bantuan"],
                                 ["Esc", "Tutup Modal"],
