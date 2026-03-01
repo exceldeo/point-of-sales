@@ -5,12 +5,10 @@ import toast from "react-hot-toast";
 
 export default function ProductCommissionFields({
     users,
-    employeeRoles = [],
     commissions,
     setData,
     errors,
 }) {
-    const [selectedRoleId, setSelectedRoleId] = useState("");
     const [bulkType, setBulkType] = useState("percentage");
     const [bulkValue, setBulkValue] = useState("");
     const [applyTarget, setApplyTarget] = useState("all");
@@ -22,44 +20,6 @@ export default function ProductCommissionFields({
             ...commissions,
             { user_id: "", type: "percentage", value: "" },
         ]);
-    };
-
-    const addEmployeesByRole = () => {
-        if (!selectedRoleId) return;
-
-        const existingUserIds = new Set(
-            commissions.map((commission) => String(commission.user_id || "")),
-        );
-
-        const usersByRole = users.filter((user) =>
-            (user.roles || []).some(
-                (role) => String(role.id) === selectedRoleId,
-            ),
-        );
-
-        const rowsToAdd = usersByRole
-            .filter((user) => !existingUserIds.has(String(user.id)))
-            .map((user) => ({
-                user_id: String(user.id),
-                type: bulkType,
-                value: bulkValue,
-            }));
-
-        if (rowsToAdd.length > 0) {
-            setData("commissions", [...commissions, ...rowsToAdd]);
-        }
-
-        setSelectedRoleId("");
-
-        if (rowsToAdd.length === 0) {
-            toast.error(
-                "Semua pengguna dengan role tersebut sudah ditambahkan.",
-            );
-        } else {
-            toast.success(
-                `${rowsToAdd.length} pengguna berhasil ditambahkan sebagai komisi.`,
-            );
-        }
     };
 
     const removeCommissionRow = (index) => {
@@ -146,38 +106,6 @@ export default function ProductCommissionFields({
 
                 {isToolsExpanded && (
                     <div className="grid grid-cols-1 gap-3 px-3 pb-3">
-                        <div className="space-y-2">
-                            <label className="text-sm font-medium text-slate-700 dark:text-slate-300">
-                                Tambah berdasarkan role karyawan
-                            </label>
-                            <div className="flex gap-2">
-                                <select
-                                    value={selectedRoleId}
-                                    onChange={(e) =>
-                                        setSelectedRoleId(e.target.value)
-                                    }
-                                    className="flex-1 h-11 px-4 text-sm rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200"
-                                >
-                                    <option value="">Pilih role</option>
-                                    {employeeRoles.map((role) => (
-                                        <option
-                                            key={role?.permission_group_id}
-                                            value={role?.permission_group_id}
-                                        >
-                                            {role?.permission_group?.name}
-                                        </option>
-                                    ))}
-                                </select>
-                                <button
-                                    type="button"
-                                    onClick={addEmployeesByRole}
-                                    className="px-3 h-11 text-sm rounded-xl bg-primary-500 text-white hover:bg-primary-600"
-                                >
-                                    Tambah
-                                </button>
-                            </div>
-                        </div>
-
                         <div className="space-y-2">
                             <label className="text-sm font-medium text-slate-700 dark:text-slate-300">
                                 Update komisi massal

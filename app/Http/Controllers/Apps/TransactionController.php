@@ -12,7 +12,6 @@ use App\Models\Product;
 use App\Models\StoreSetting;
 use App\Models\Transaction;
 use App\Models\User;
-use App\Models\EmployeeRole;
 use App\Support\StockLogContext;
 use App\Services\Payments\PaymentGatewayManager;
 use Illuminate\Database\Eloquent\Builder;
@@ -62,10 +61,6 @@ class TransactionController extends Controller
         $customers = Customer::latest()->get();
 
         // get users for optional assignment
-        $employeeRoles = EmployeeRole::query()
-            ->with('permissionGroup')
-            ->select('id', 'permission_group_id')
-            ->get();
         $employees = (new EmployeeManagementController())->getEmployees();
 
         // get all products with categories for product grid

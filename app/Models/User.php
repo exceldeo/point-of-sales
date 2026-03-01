@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use App\Models\EmployeeRole;
 use App\Models\StockTransaction;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -25,6 +24,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'is_employee',
     ];
 
     /**
@@ -47,6 +47,7 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'is_employee' => 'boolean',
         ];
     }
 

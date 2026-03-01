@@ -15,7 +15,7 @@ import {
     IconCurrencyDollar,
 } from "@tabler/icons-react";
 
-export default function Create({ categories, employees, employeeRoles }) {
+export default function Create({ categories, employees }) {
     const { errors } = usePage().props;
 
     const { data, setData, post, processing } = useForm({
@@ -214,7 +214,6 @@ export default function Create({ categories, employees, employeeRoles }) {
                     <div className="lg:col-span-3 space-y-6">
                         <ProductCommissionFields
                             users={employees}
-                            employeeRoles={employeeRoles}
                             commissions={data.commissions}
                             setData={setData}
                             errors={errors}

@@ -21,7 +21,7 @@ class UserController extends Controller
             ->with('roles')
             ->when(request()->search, fn($query) => $query->where('name', 'like', '%' . request()->search . '%'))
             ->with('logCommissions:id,user_id,nominal')
-            ->select('id', 'name', 'avatar', 'email')
+            ->select('id', 'name', 'avatar', 'email', 'is_employee')
             ->latest()
             ->paginate(7)
             ->withQueryString();
@@ -59,6 +59,7 @@ class UserController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'password' => bcrypt($request->password),
+            'is_employee' => $request->boolean('is_employee'),
         ]);
 
         // assign role to user
@@ -104,6 +105,7 @@ class UserController extends Controller
         // update user data name
         $user->update([
             'name' => $request->name,
+            'is_employee' => $request->boolean('is_employee'),
         ]);
 
         // assign role to user

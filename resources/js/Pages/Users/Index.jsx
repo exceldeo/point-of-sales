@@ -48,6 +48,9 @@ function UserCard({ user, isSelected, onSelect, onDelete }) {
                             <IconMail size={14} />
                             {user.email}
                         </p>
+                        <p className="text-xs mt-1 text-slate-500 dark:text-slate-400">
+                            {user.is_employee ? "Karyawan" : "Non-karyawan"}
+                        </p>
                     </div>
                 </div>
                 <Checkbox
@@ -310,6 +313,11 @@ export default function Index() {
                                                     </p>
                                                     <p className="text-xs text-slate-500">
                                                         {user.email}
+                                                    </p>
+                                                    <p className="text-xs text-slate-500">
+                                                        {user.is_employee
+                                                            ? "Karyawan"
+                                                            : "Non-karyawan"}
                                                     </p>
                                                 </div>
                                             </div>

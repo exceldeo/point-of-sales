@@ -19,6 +19,7 @@ export default function Edit() {
         email: user.email,
         password: "",
         password_confirmation: "",
+        is_employee: Boolean(user.is_employee),
         selectedRoles: user.roles.map((role) => role.name),
         _method: "PUT",
     });
@@ -109,10 +110,20 @@ export default function Edit() {
                                 onChange={(e) =>
                                     setData(
                                         "password_confirmation",
-                                        e.target.value
+                                        e.target.value,
                                     )
                                 }
                                 errors={errors.password_confirmation}
+                            />
+                        </div>
+                        <div className="mt-4">
+                            <Checkbox
+                                label="Tandai sebagai karyawan"
+                                checked={data.is_employee}
+                                onChange={(e) =>
+                                    setData("is_employee", e.target.checked)
+                                }
+                                errors={errors.is_employee}
                             />
                         </div>
                     </div>
@@ -137,7 +148,7 @@ export default function Edit() {
                                         value={role.name}
                                         onChange={setSelectedRoles}
                                         checked={data.selectedRoles.includes(
-                                            role.name
+                                            role.name,
                                         )}
                                     />
                                     <span className="text-sm font-medium text-slate-700 dark:text-slate-300 capitalize">

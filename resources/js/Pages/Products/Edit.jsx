@@ -16,12 +16,7 @@ import {
 } from "@tabler/icons-react";
 import { getProductImageUrl } from "@/Utils/imageUrl";
 
-export default function Edit({
-    categories,
-    product,
-    employees,
-    employeeRoles,
-}) {
+export default function Edit({ categories, product, employees }) {
     const { errors } = usePage().props;
 
     const initialCommissions = (product.commission_users || []).map(
@@ -237,7 +232,6 @@ export default function Edit({
                     <div className="lg:col-span-3 space-y-6">
                         <ProductCommissionFields
                             users={employees}
-                            employeeRoles={employeeRoles}
                             commissions={data.commissions}
                             setData={setData}
                             errors={errors}
