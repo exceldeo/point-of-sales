@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Apps;
 use Inertia\Inertia;
 use App\Models\Product;
 use App\Models\Category;
-use App\Models\User;
 use Illuminate\Http\Request;
 use App\Support\StockLogContext;
 use App\Http\Controllers\Controller;
@@ -41,18 +40,12 @@ class ProductController extends Controller
     {
         //get categories
         $categories = Category::all();
-        $users = User::query()
-            ->select('id', 'name', 'email')
-            ->orderBy('name')
-            ->get();
         $employees = (new EmployeeManagementController())->getEmployees();
-        $employeeRoles = (new EmployeeManagementController())->getEmployeeRoles();
 
         //return inertia
         return Inertia::render('Products/Create', [
             'categories' => $categories,
             'employees' => $employees,
-            'employeeRoles' => $employeeRoles,
         ]);
     }
 
@@ -118,21 +111,15 @@ class ProductController extends Controller
     {
         //get categories
         $categories = Category::all();
-        $users = User::query()
-            ->select('id', 'name', 'email')
-            ->orderBy('name')
-            ->get();
 
         $product->load(['commissionUsers' => fn($query) => $query->select('users.id', 'name', 'email')]);
 
         $employees = (new EmployeeManagementController())->getEmployees();
-        $employeeRoles = (new EmployeeManagementController())->getEmployeeRoles();
 
         return Inertia::render('Products/Edit', [
             'product' => $product,
             'categories' => $categories,
             'employees' => $employees,
-            'employeeRoles' => $employeeRoles,
         ]);
     }
 

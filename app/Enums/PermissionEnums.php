@@ -4,6 +4,8 @@ namespace App\Enums;
 
 enum PermissionEnums: string
 {
+    // profile permission
+    case PROFILE_ACCESS = 'profile-access';
     // dashboard permission
     case DASHBOARD_ACCESS = 'dashboard-access';
     // users permission
@@ -57,6 +59,7 @@ enum PermissionEnums: string
     public function label(): string
     {
         return match ($this) {
+            self::PROFILE_ACCESS => 'Akses Profil',
             self::DASHBOARD_ACCESS => 'Akses Dashboard',
             self::USERS_ACCESS => 'Akses Pengguna',
             self::USERS_CREATE => 'Buat Pengguna',
@@ -98,6 +101,7 @@ enum PermissionEnums: string
     public function router(): string
     {
         return match ($this) {
+            self::PROFILE_ACCESS => 'profile.edit',
             self::DASHBOARD_ACCESS => 'dashboard',
             self::USERS_ACCESS => 'users.index',
             self::ROLES_ACCESS => 'roles.index',

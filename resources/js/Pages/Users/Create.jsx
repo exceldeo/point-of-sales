@@ -9,6 +9,7 @@ import {
 } from "@tabler/icons-react";
 import Input from "@/Components/Common/Input";
 import Checkbox from "@/Components/Common/Checkbox";
+import Switch from "@/Components/Common/Switch";
 import toast from "react-hot-toast";
 
 export default function Create() {
@@ -19,6 +20,7 @@ export default function Create() {
         email: "",
         password: "",
         password_confirmation: "",
+        is_employee: false,
         selectedRoles: [],
     });
 
@@ -104,10 +106,20 @@ export default function Create() {
                                 onChange={(e) =>
                                     setData(
                                         "password_confirmation",
-                                        e.target.value
+                                        e.target.value,
                                     )
                                 }
                                 errors={errors.password_confirmation}
+                            />
+                        </div>
+                        <div className="mt-4">
+                            <Switch
+                                label="Tandai sebagai karyawan"
+                                checked={data.is_employee}
+                                onChange={(value) =>
+                                    setData("is_employee", value)
+                                }
+                                errors={errors.is_employee}
                             />
                         </div>
                     </div>
@@ -132,7 +144,7 @@ export default function Create() {
                                         value={role.name}
                                         onChange={setSelectedRoles}
                                         checked={data.selectedRoles.includes(
-                                            role.name
+                                            role.name,
                                         )}
                                     />
                                     <span className="text-sm font-medium text-slate-700 dark:text-slate-300 capitalize">

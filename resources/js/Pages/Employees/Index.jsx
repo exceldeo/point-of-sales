@@ -1,66 +1,31 @@
-import React, { useEffect } from "react";
+import React from "react";
 import AppLayout from "@/Layouts/AppLayout";
-import { Head, router, useForm, usePage } from "@inertiajs/react";
+import { Head, router } from "@inertiajs/react";
 import {
-    IconCirclePlus,
     IconBriefcase,
     IconDatabaseOff,
     IconSearch,
-    IconShield,
-    IconUserShield,
-    IconPencilCheck,
     IconCash,
 } from "@tabler/icons-react";
-import ListBox from "@/Components/Common/ListBox";
 import Table from "@/Components/Common/Table";
 import Pagination from "@/Components/Common/Pagination";
-import Button from "@/Components/Common/Button";
-import hasAnyPermission, { permissionEnums } from "@/Utils/Permission";
-import Modal from "@/Components/Common/Modal";
 import formatCurrency from "@/Utils/formatCurrency";
 import Swal from "sweetalert2";
 
-export default function Index({
-    employees,
-    filters,
-    permissionGroups,
-    employeeRoles,
-}) {
-    const { errors } = usePage().props;
-
-    const { data, setData, transform, post } = useForm({
-        selectedPermissionGroup: [],
-        isOpen: false,
-    });
-
-    useEffect(() => {
-        const selected = (employeeRoles || [])
-            .map((item) => item.permission_group)
-            .filter(Boolean);
-
-        setData("selectedPermissionGroup", selected);
-    }, [employeeRoles]);
-
-    const setSelectedPermissionGroup = (value) =>
-        setData("selectedPermissionGroup", value);
-
-    transform((data) => ({
-        ...data,
-        selectedPermissionGroup: data.selectedPermissionGroup.map(
-            (permissionGroup) => permissionGroup.id,
-        ),
-        _method: "put",
-    }));
-
-    const updateEmployeeRole = async (e) => {
-        e.preventDefault();
-        post(route("employee-management.permission-group.update"), {
-            onSuccess: () =>
-                setData({
-                    selectedPermissionGroup: [],
-                    isOpen: false,
-                }),
-        });
+export default function Index({ employees, filters }) {
+    const applyFilter = (nextFilters) => {
+        router.get(
+            route("employee-management.index"),
+            {
+                ...filters,
+                ...nextFilters,
+            },
+            {
+                preserveState: true,
+                preserveScroll: true,
+                replace: true,
+            },
+        );
     };
 
     const onWithdraw = (employeeId) => {
@@ -144,55 +109,6 @@ export default function Index({
                             {employees.total || 0} data karyawan
                         </p>
                     </div>
-
-                    {hasAnyPermission([
-                        permissionEnums.EMPLOYEE_MANAGEMENT_CHANGE,
-                    ]) && (
-                        <Button
-                            type={"button"}
-                            icon={
-                                <IconPencilCheck size={18} strokeWidth={1.5} />
-                            }
-                            className={
-                                "bg-primary-500 hover:bg-primary-600 text-white shadow-lg shadow-primary-500/30"
-                            }
-                            label={"Ubah Role Karyawan"}
-                            onClick={() => setData("isOpen", true)}
-                        />
-                    )}
-
-                    {/* Modal */}
-                    <Modal
-                        show={data.isOpen}
-                        onClose={() =>
-                            setData({
-                                isOpen: false,
-                                selectedPermissionGroup: [],
-                            })
-                        }
-                        title={"Atur Group Karyawan"}
-                        icon={<IconUserShield size={20} strokeWidth={1.5} />}
-                    >
-                        <form onSubmit={updateEmployeeRole}>
-                            <div className="mb-4">
-                                <ListBox
-                                    label={"Pilih Group Karyawan"}
-                                    data={permissionGroups}
-                                    selected={data.selectedPermissionGroup}
-                                    setSelected={setSelectedPermissionGroup}
-                                    errors={errors.selectedPermissionGroup}
-                                />
-                            </div>
-                            <Button
-                                type={"submit"}
-                                icon={<IconPencilCheck size={18} />}
-                                className={
-                                    "bg-primary-500 hover:bg-primary-600 text-white w-full justify-center"
-                                }
-                                label={"Simpan"}
-                            />
-                        </form>
-                    </Modal>
                 </div>
             </div>
 

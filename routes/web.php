@@ -49,9 +49,6 @@ Route::group(['prefix' => '', 'middleware' => ['auth']], function () {
     Route::get('/employees-management', [EmployeeManagementController::class, 'index'])
         ->middleware('permission:'.PermissionEnums::EMPLOYEE_MANAGEMENT_ACCESS->value)
         ->name('employee-management.index');
-    Route::put('/employees/permission-group', [EmployeeManagementController::class, 'updatePermissionGroup'])
-        ->middleware('permission:'.PermissionEnums::EMPLOYEE_MANAGEMENT_CHANGE->value)
-        ->name('employee-management.permission-group.update');
     Route::post('/employees/{employee}/withdraw', [EmployeeManagementController::class, 'withdrawCommission'])
         ->middleware('permission:'.PermissionEnums::EMPLOYEE_MANAGEMENT_ACCESS->value)
         ->name('employee-management.withdraw');
@@ -140,9 +137,9 @@ Route::group(['prefix' => '', 'middleware' => ['auth']], function () {
     Route::get('/reports/sales', [SalesReportController::class, 'index'])->middleware('permission:'.PermissionEnums::REPORTS_ACCESS->value)->name('reports.sales.index');
     Route::get('/reports/profits', [ProfitReportController::class, 'index'])->middleware('permission:'.PermissionEnums::PROFITS_ACCESS->value)->name('reports.profits.index');
 
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::get('/profile', [ProfileController::class, 'edit'])->middleware('permission:'.PermissionEnums::PROFILE_ACCESS->value)->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->middleware('permission:'.PermissionEnums::PROFILE_ACCESS->value)->name('profile.update');
+    // Route::delete('/profile', [ProfileController::class, 'destroy'])->middleware('permission:'.PermissionEnums::PROFILE_ACCESS->value)->name('profile.destroy');
 });
 
 require __DIR__ . '/auth.php';

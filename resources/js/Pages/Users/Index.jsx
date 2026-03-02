@@ -48,6 +48,9 @@ function UserCard({ user, isSelected, onSelect, onDelete }) {
                             <IconMail size={14} />
                             {user.email}
                         </p>
+                        <p className="text-xs mt-1 text-slate-500 dark:text-slate-400">
+                            {user.is_employee ? "Karyawan" : "Non-karyawan"}
+                        </p>
                     </div>
                 </div>
                 <Checkbox
@@ -273,6 +276,7 @@ export default function Index() {
                                     <Table.Th className={"w-10"}>No</Table.Th>
                                     <Table.Th>Pengguna</Table.Th>
                                     <Table.Th>Total Komisi</Table.Th>
+                                    <Table.Th>Karyawan</Table.Th>
                                     <Table.Th>Group Akses</Table.Th>
                                     <Table.Th></Table.Th>
                                 </tr>
@@ -311,6 +315,11 @@ export default function Index() {
                                                     <p className="text-xs text-slate-500">
                                                         {user.email}
                                                     </p>
+                                                    <p className="text-xs text-slate-500">
+                                                        {user.is_employee
+                                                            ? "Karyawan"
+                                                            : "Non-karyawan"}
+                                                    </p>
                                                 </div>
                                             </div>
                                         </Table.Td>
@@ -324,6 +333,17 @@ export default function Index() {
                                                     ),
                                                 )}
                                             </span>
+                                        </Table.Td>
+                                        <Table.Td>
+                                            {user.is_employee ? (
+                                                <span className="px-2 py-0.5 text-xs font-medium bg-green-100 dark:bg-green-900/50 text-green-700 dark:text-green-400 rounded-full">
+                                                    Karyawan
+                                                </span>
+                                            ) : (
+                                                <span className="px-2 py-0.5 text-xs font-medium bg-gray-100 dark:bg-gray-900/50 text-gray-700 dark:text-gray-400 rounded-full">
+                                                    Non-karyawan
+                                                </span>
+                                            )}
                                         </Table.Td>
                                         <Table.Td>
                                             <div className="flex flex-wrap gap-1">

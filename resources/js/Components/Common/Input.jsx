@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useState } from "react";
+import { IconEye, IconEyeOff } from "@tabler/icons-react";
 
 export default function Input({
     label,
@@ -9,6 +10,9 @@ export default function Input({
     suffix,
     ...props
 }) {
+    const isPasswordType = type === "password";
+    const [showPassword, setShowPassword] = useState(false);
+
     return (
         <div className="flex flex-col gap-2">
             {label && (
@@ -24,7 +28,7 @@ export default function Input({
                 )}
 
                 <input
-                    type={type}
+                    type={isPasswordType && showPassword ? "text" : type}
                     className={`
                         w-full h-11 px-4 text-sm rounded-xl
                         border border-slate-200 dark:border-slate-700
@@ -34,7 +38,7 @@ export default function Input({
                         focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500
                         transition-all duration-200
                         ${prefix ? "pl-10" : ""}
-                        ${suffix ? "pr-10" : ""}
+                        ${suffix || isPasswordType ? "pr-20" : ""}
                         ${
                             errors
                                 ? "border-danger-500 focus:border-danger-500 focus:ring-danger-500/20"
@@ -45,9 +49,30 @@ export default function Input({
                     {...props}
                 />
 
-                {suffix && (
+                {suffix && !isPasswordType && (
                     <div className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 dark:text-slate-400 pointer-events-none">
                         {suffix}
+                    </div>
+                )}
+
+                {isPasswordType && (
+                    <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-2">
+                        {suffix && (
+                            <span className="text-slate-500 dark:text-slate-400 pointer-events-none">
+                                {suffix}
+                            </span>
+                        )}
+                        <button
+                            type="button"
+                            onClick={() => setShowPassword((prev) => !prev)}
+                            className="text-xs font-semibold text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+                        >
+                            {showPassword ? (
+                                <IconEyeOff size={16} />
+                            ) : (
+                                <IconEye size={16} />
+                            )}
+                        </button>
                     </div>
                 )}
             </div>

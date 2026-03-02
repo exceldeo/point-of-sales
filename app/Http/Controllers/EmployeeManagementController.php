@@ -2,13 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\EmployeeRole;
 use App\Models\LogCommission;
 use App\Models\User;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
-use Spatie\Permission\Models\Role;
 
 class EmployeeManagementController extends Controller
 {
@@ -18,15 +14,8 @@ class EmployeeManagementController extends Controller
             'search' => request('search'),
         ];
 
-        $employeeRoles = EmployeeRole::query()
-            ->with('permissionGroup')
-            ->select('id', 'permission_group_id')
-            ->get();
-
         $employees = User::query()->with('roles:id,name')
-            ->whereHas('roles', function ($query) use ($employeeRoles) {
-                $query->whereIn('id', $employeeRoles->pluck('permission_group_id'));
-            })
+            ->where('is_employee', true)
             ->when($filters['search'], function ($query, $search) {
                 $query->where(function ($q) use ($search) {
                     $q->where('name', 'like', '%' . $search . '%')
@@ -38,50 +27,17 @@ class EmployeeManagementController extends Controller
             ->latest()
             ->paginate(20);
 
-        $permissionGroups = Role::query()
-            ->select('id', 'name')
-            ->orderBy('name')
-            ->get();
-
         return Inertia::render('Employees/Index', [
             'employees' => $employees,
-            'permissionGroups' => $permissionGroups,
-            'employeeRoles' => $employeeRoles,
             'filters' => $filters,
         ]);
     }
 
-    public function updatePermissionGroup(Request $request)
-    {
-        $data = $request->validate([
-            'selectedPermissionGroup' => ['required', 'array'],
-        ]);
-
-        DB::transaction(function () use ($data) {
-            // update employee role data. if employee role data not exist, create new one and if not in selectedPermissionGroup, delete employee role data
-            EmployeeRole::query()->whereNotIn('permission_group_id', $data['selectedPermissionGroup'])->delete();
-            foreach ($data['selectedPermissionGroup'] as $permissionGroupId) {
-                EmployeeRole::query()->updateOrCreate(
-                    ['permission_group_id' => $permissionGroupId]
-                );
-            }
-        });
-
-        return back();
-    }
-
     public function getEmployees($keyword = null)
     {
-        $employeeRoles = EmployeeRole::query()
-            ->with('permissionGroup')
-            ->select('id', 'permission_group_id')
-            ->get();
-
         $employees = User::query()->with('roles:id,name')
             ->withSum('logCommissions as total_commission', 'nominal')
-            ->whereHas('roles', function ($query) use ($employeeRoles) {
-                $query->whereIn('id', $employeeRoles->pluck('permission_group_id'));
-            })
+            ->where('is_employee', true)
             ->when($keyword, function ($query, $keyword) {
                 $query->where(function ($q) use ($keyword) {
                     $q->where('name', 'like', '%' . $keyword . '%')
@@ -95,18 +51,14 @@ class EmployeeManagementController extends Controller
         return $employees;
     }
 
-    public function getEmployeeRoles()
-    {
-        $employeeRoles = EmployeeRole::query()
-            ->with('permissionGroup')
-            ->select('id', 'permission_group_id')
-            ->get();
-
-        return $employeeRoles;
-    }
-
     public function withdrawCommission(User $employee)
     {
+        if (!$employee->is_employee) {
+            return back()->withErrors([
+                'withdraw' => 'User bukan karyawan.',
+            ]);
+        }
+
         $outstandingCommission = (int) $employee->logCommissions()->sum('nominal');
 
         if ($outstandingCommission <= 0) {
