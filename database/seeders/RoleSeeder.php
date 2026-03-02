@@ -25,7 +25,8 @@ class RoleSeeder extends Seeder
             PermissionEnums::TRANSACTIONS_ACCESS->value,
             PermissionEnums::CUSTOMERS_ACCESS->value,
             PermissionEnums::CUSTOMERS_CREATE->value,
-            PermissionEnums::STOCK_MANAGEMENT_ACCESS->value
+            PermissionEnums::STOCK_MANAGEMENT_ACCESS->value,
+            PermissionEnums::PROFILE_ACCESS->value,
         ])->get();
         $cashierRole->givePermissionTo($cashierPermissions);
     }

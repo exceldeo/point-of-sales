@@ -33,9 +33,9 @@ export default function Edit({ mustVerifyEmail, status, commissions }) {
                             <UpdatePasswordForm className="max-w-xl" />
                         </div>
 
-                        <div className="p-4 sm:p-8 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl">
+                        {/* <div className="p-4 sm:p-8 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl">
                             <DeleteUserForm className="max-w-xl" />
-                        </div>
+                        </div> */}
                     </div>
 
                     <div className="p-4 sm:p-8 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl">
