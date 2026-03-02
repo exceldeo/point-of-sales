@@ -240,7 +240,9 @@ export default function Menu() {
                     href: route("profile.edit"),
                     active: url === "/profile",
                     icon: <IconUserCircle size={20} strokeWidth={1.5} />,
-                    permissions: true,
+                    permissions: hasAnyPermission([
+                        permissionEnums.PROFILE_ACCESS,
+                    ]),
                 },
             ],
         },
