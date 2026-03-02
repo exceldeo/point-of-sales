@@ -9,6 +9,7 @@ import {
 } from "@tabler/icons-react";
 import Input from "@/Components/Common/Input";
 import Checkbox from "@/Components/Common/Checkbox";
+import Switch from "@/Components/Common/Switch";
 import toast from "react-hot-toast";
 
 export default function Create() {
@@ -112,11 +113,11 @@ export default function Create() {
                             />
                         </div>
                         <div className="mt-4">
-                            <Checkbox
+                            <Switch
                                 label="Tandai sebagai karyawan"
                                 checked={data.is_employee}
-                                onChange={(e) =>
-                                    setData("is_employee", e.target.checked)
+                                onChange={(value) =>
+                                    setData("is_employee", value)
                                 }
                                 errors={errors.is_employee}
                             />

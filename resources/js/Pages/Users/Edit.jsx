@@ -10,6 +10,7 @@ import {
 import Input from "@/Components/Common/Input";
 import Checkbox from "@/Components/Common/Checkbox";
 import toast from "react-hot-toast";
+import Switch from "@/Components/Common/Switch";
 
 export default function Edit() {
     const { roles, user } = usePage().props;
@@ -117,11 +118,11 @@ export default function Edit() {
                             />
                         </div>
                         <div className="mt-4">
-                            <Checkbox
+                            <Switch
                                 label="Tandai sebagai karyawan"
                                 checked={data.is_employee}
-                                onChange={(e) =>
-                                    setData("is_employee", e.target.checked)
+                                onChange={(value) =>
+                                    setData("is_employee", value)
                                 }
                                 errors={errors.is_employee}
                             />
