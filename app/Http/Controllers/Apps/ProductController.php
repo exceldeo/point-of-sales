@@ -57,6 +57,10 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
+        $request->merge([
+            'commissions' => $this->sanitizeCommissionsInput($request->input('commissions', [])),
+        ]);
+
         /**
          * validate
          */
@@ -71,7 +75,7 @@ class ProductController extends Controller
             'commissions' => 'nullable|array',
             'commissions.*.user_id' => 'required|integer|distinct|exists:users,id',
             'commissions.*.type' => 'required|in:percentage,nominal',
-            'commissions.*.value' => 'required|numeric|min:0',
+            'commissions.*.value' => 'required|numeric|gt:0',
         ]);
         //upload image
         $image = $request->file('image');
@@ -132,6 +136,10 @@ class ProductController extends Controller
      */
     public function update(Request $request, Product $product)
     {
+        $request->merge([
+            'commissions' => $this->sanitizeCommissionsInput($request->input('commissions', [])),
+        ]);
+
         /**
          * validate
          */
@@ -146,7 +154,7 @@ class ProductController extends Controller
             'commissions' => 'nullable|array',
             'commissions.*.user_id' => 'required|integer|distinct|exists:users,id',
             'commissions.*.type' => 'required|in:percentage,nominal',
-            'commissions.*.value' => 'required|numeric|min:0',
+            'commissions.*.value' => 'required|numeric|gt:0',
         ]);
 
         $payload = [
@@ -216,6 +224,28 @@ class ProductController extends Controller
                 ],
             ])
             ->toArray();
+    }
+
+    private function sanitizeCommissionsInput($commissions): array
+    {
+        return collect(is_array($commissions) ? $commissions : [])
+            ->filter(fn($commission) => is_array($commission) && array_key_exists('value', $commission))
+            ->filter(function ($commission) {
+                $rawValue = $commission['value'];
+                $normalizedValue = is_string($rawValue) ? trim($rawValue) : $rawValue;
+
+                if ($normalizedValue === '' || $normalizedValue === null) {
+                    return false;
+                }
+
+                if (is_numeric($normalizedValue) && (float) $normalizedValue == 0.0) {
+                    return false;
+                }
+
+                return true;
+            })
+            ->values()
+            ->all();
     }
 
     
