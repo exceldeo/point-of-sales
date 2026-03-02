@@ -1,6 +1,5 @@
-import React, { useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import Input from "@/Components/Common/Input";
-import Swal from "sweetalert2";
 import toast from "react-hot-toast";
 
 export default function ProductCommissionFields({
@@ -14,25 +13,53 @@ export default function ProductCommissionFields({
     const [applyTarget, setApplyTarget] = useState("all");
     const [selectedRows, setSelectedRows] = useState([]);
     const [isToolsExpanded, setIsToolsExpanded] = useState(false);
+    const [search, setSearch] = useState("");
 
-    const addCommissionRow = () => {
-        setData("commissions", [
-            ...commissions,
-            { user_id: "", type: "percentage", value: "" },
-        ]);
-    };
+    const usersById = useMemo(
+        () => new Map(users.map((user) => [String(user.id), user])),
+        [users],
+    );
 
-    const removeCommissionRow = (index) => {
-        setData(
-            "commissions",
-            commissions.filter((_, rowIndex) => rowIndex !== index),
+    useEffect(() => {
+        const commissionByUserId = new Map(
+            commissions.map((commission) => [
+                String(commission.user_id),
+                commission,
+            ]),
         );
+
+        const normalizedCommissions = users.map((user) => {
+            const existing = commissionByUserId.get(String(user.id));
+
+            return {
+                user_id: String(user.id),
+                type: existing?.type || "percentage",
+                value: existing?.value ?? "",
+            };
+        });
+
+        const isSame =
+            normalizedCommissions.length === commissions.length &&
+            normalizedCommissions.every((item, index) => {
+                const current = commissions[index];
+
+                return (
+                    String(current?.user_id || "") === String(item.user_id) &&
+                    String(current?.type || "") === String(item.type) &&
+                    String(current?.value ?? "") === String(item.value ?? "")
+                );
+            });
+
+        if (!isSame) {
+            setData("commissions", normalizedCommissions);
+        }
+    }, [users, commissions, setData]);
+
+    useEffect(() => {
         setSelectedRows((prev) =>
-            prev.filter((rowIndex) => rowIndex !== index),
+            prev.filter((rowIndex) => rowIndex < commissions.length),
         );
-
-        toast.success("Baris komisi berhasil dihapus.");
-    };
+    }, [commissions.length]);
 
     const updateCommissionField = (index, field, value) => {
         setData(
@@ -42,6 +69,25 @@ export default function ProductCommissionFields({
             ),
         );
     };
+
+    const filteredRows = useMemo(() => {
+        const keyword = search.trim().toLowerCase();
+
+        return commissions
+            .map((commission, index) => ({
+                commission,
+                index,
+                user: usersById.get(String(commission.user_id)),
+            }))
+            .filter(({ user }) => {
+                if (!keyword) return true;
+
+                const name = String(user?.name || "").toLowerCase();
+                const email = String(user?.email || "").toLowerCase();
+
+                return name.includes(keyword) || email.includes(keyword);
+            });
+    }, [commissions, usersById, search]);
 
     const toggleSelectedRow = (index) => {
         setSelectedRows((prev) =>
@@ -75,19 +121,54 @@ export default function ProductCommissionFields({
         toast.success("Komisi massal berhasil diterapkan.");
     };
 
+    const resetCommissionValues = () => {
+        setData(
+            "commissions",
+            commissions.map((item) => ({
+                ...item,
+                value: "",
+            })),
+        );
+
+        toast.success("Semua nilai komisi berhasil di-reset.");
+    };
+
+    const setZeroCommission = () => {
+        const targetRows =
+            applyTarget === "selected"
+                ? new Set(selectedRows)
+                : new Set(commissions.map((_, index) => index));
+
+        if (applyTarget === "selected" && targetRows.size === 0) {
+            toast.error("Pilih minimal satu baris terlebih dahulu.");
+            return;
+        }
+
+        setData(
+            "commissions",
+            commissions.map((item, index) =>
+                targetRows.has(index)
+                    ? {
+                          ...item,
+                          value: "0",
+                      }
+                    : item,
+            ),
+        );
+
+        toast.success(
+            applyTarget === "selected"
+                ? "Komisi terpilih diubah ke 0."
+                : "Semua komisi diubah ke 0.",
+        );
+    };
+
     return (
         <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5">
             <div className="flex items-center justify-between mb-4">
                 <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300">
                     Komisi Pengguna
                 </h3>
-                <button
-                    type="button"
-                    onClick={addCommissionRow}
-                    className="px-3 py-2 text-xs rounded-lg bg-primary-100 text-primary-700 dark:bg-primary-900/40 dark:text-primary-300"
-                >
-                    + Tambah Komisi
-                </button>
             </div>
 
             <div className="mb-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/40">
@@ -149,12 +230,45 @@ export default function ProductCommissionFields({
                                     Terapkan
                                 </button>
                             </div>
+
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                <button
+                                    type="button"
+                                    onClick={resetCommissionValues}
+                                    className="h-11 px-3 text-sm rounded-xl border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"
+                                >
+                                    Reset semua nilai
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={setZeroCommission}
+                                    className="h-11 px-3 text-sm rounded-xl border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"
+                                >
+                                    Set 0 (
+                                    {applyTarget === "selected"
+                                        ? "Terpilih"
+                                        : "Semua"}
+                                    )
+                                </button>
+                            </div>
                         </div>
                     </div>
                 )}
             </div>
 
             <div className="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-800">
+                <div className="space-y-2">
+                    <label className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                        Cari karyawan
+                    </label>
+                    <Input
+                        type="text"
+                        label=""
+                        placeholder="Cari nama atau email"
+                        value={search}
+                        onChange={(e) => setSearch(e.target.value)}
+                    />
+                </div>
                 <table className="min-w-full text-sm">
                     <thead className="bg-slate-50 dark:bg-slate-900/70">
                         <tr>
@@ -162,20 +276,37 @@ export default function ProductCommissionFields({
                                 <input
                                     type="checkbox"
                                     checked={
-                                        selectedRows.length ===
-                                            commissions.length &&
-                                        commissions.length > 0
+                                        filteredRows.length > 0 &&
+                                        filteredRows.every(({ index }) =>
+                                            selectedRows.includes(index),
+                                        )
                                     }
                                     onChange={() => {
-                                        if (
-                                            selectedRows.length ===
-                                            commissions.length
-                                        ) {
-                                            setSelectedRows([]);
+                                        const visibleIndexes = filteredRows.map(
+                                            ({ index }) => index,
+                                        );
+                                        const isAllVisibleSelected =
+                                            visibleIndexes.length > 0 &&
+                                            visibleIndexes.every((index) =>
+                                                selectedRows.includes(index),
+                                            );
+
+                                        if (isAllVisibleSelected) {
+                                            setSelectedRows((prev) =>
+                                                prev.filter(
+                                                    (index) =>
+                                                        !visibleIndexes.includes(
+                                                            index,
+                                                        ),
+                                                ),
+                                            );
                                         } else {
-                                            setSelectedRows(
-                                                commissions.map(
-                                                    (_, index) => index,
+                                            setSelectedRows((prev) =>
+                                                Array.from(
+                                                    new Set([
+                                                        ...prev,
+                                                        ...visibleIndexes,
+                                                    ]),
                                                 ),
                                             );
                                         }
@@ -192,13 +323,10 @@ export default function ProductCommissionFields({
                             <th className="w-52 px-3 py-3 text-left font-semibold text-slate-600 dark:text-slate-300">
                                 Nilai
                             </th>
-                            <th className="w-24 px-3 py-3 text-left font-semibold text-slate-600 dark:text-slate-300">
-                                Aksi
-                            </th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-200 dark:divide-slate-800 bg-white dark:bg-slate-900">
-                        {commissions.map((commission, index) => (
+                        {filteredRows.map(({ commission, index, user }) => (
                             <tr key={index}>
                                 <td className="px-3 py-3 align-top">
                                     <input
@@ -211,43 +339,12 @@ export default function ProductCommissionFields({
                                     />
                                 </td>
                                 <td className="px-3 py-3 align-top">
-                                    <select
-                                        value={commission.user_id}
-                                        onChange={(e) =>
-                                            updateCommissionField(
-                                                index,
-                                                "user_id",
-                                                e.target.value,
-                                            )
-                                        }
-                                        className="w-full h-11 px-4 text-sm rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-200"
-                                    >
-                                        <option value="">Pilih pengguna</option>
-                                        {users
-                                            .filter(
-                                                (user) =>
-                                                    String(user.id) ===
-                                                        String(
-                                                            commission.user_id,
-                                                        ) ||
-                                                    !commissions.some(
-                                                        (c, i) =>
-                                                            i !== index &&
-                                                            String(
-                                                                c.user_id,
-                                                            ) ===
-                                                                String(user.id),
-                                                    ),
-                                            )
-                                            .map((user) => (
-                                                <option
-                                                    key={user.id}
-                                                    value={user.id}
-                                                >
-                                                    {user.name} ({user.email})
-                                                </option>
-                                            ))}
-                                    </select>
+                                    <div className="h-11 px-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-200 flex items-center">
+                                        <span className="truncate">
+                                            {user?.name || "-"} (
+                                            {user?.email || "-"})
+                                        </span>
+                                    </div>
                                     {errors[`commissions.${index}.user_id`] && (
                                         <small className="mt-1 block text-xs text-danger-500 dark:text-danger-400">
                                             {
@@ -314,19 +411,20 @@ export default function ProductCommissionFields({
                                         placeholder="0"
                                     />
                                 </td>
-                                <td className="px-3 py-3 align-top">
-                                    <button
-                                        type="button"
-                                        onClick={() =>
-                                            removeCommissionRow(index)
-                                        }
-                                        className="h-11 px-3 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-500 hover:text-danger-500"
-                                    >
-                                        Hapus
-                                    </button>
-                                </td>
                             </tr>
                         ))}
+
+                        {filteredRows.length === 0 && (
+                            <tr>
+                                <td
+                                    colSpan={4}
+                                    className="px-3 py-6 text-center text-sm text-slate-500 dark:text-slate-400"
+                                >
+                                    Tidak ada data karyawan yang sesuai
+                                    pencarian.
+                                </td>
+                            </tr>
+                        )}
                     </tbody>
                 </table>
 
