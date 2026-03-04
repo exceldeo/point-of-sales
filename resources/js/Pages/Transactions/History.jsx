@@ -1,9 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { Head, router, Link } from "@inertiajs/react";
+import axios from "axios";
+import toast from "react-hot-toast";
 import AppLayout from "@/Layouts/AppLayout";
 import Button from "@/Components/Common/Button";
 import Table from "@/Components/Common/Table";
 import Pagination from "@/Components/Common/Pagination";
+import PrintPreview from "@/Components/Receipt/PrintPreview";
 import {
     IconDatabaseOff,
     IconSearch,
@@ -37,6 +40,10 @@ const History = ({
         ...filters,
     });
     const [showFilters, setShowFilters] = useState(false);
+    const [isPrintModalOpen, setIsPrintModalOpen] = useState(false);
+    const [printInvoice, setPrintInvoice] = useState(null);
+    const [printData, setPrintData] = useState(null);
+    const [isPrintLoading, setIsPrintLoading] = useState(false);
 
     useEffect(() => {
         setFilterData({
@@ -68,6 +75,32 @@ const History = ({
             preserveState: true,
             replace: true,
         });
+    };
+
+    const handleOpenPrintPreview = async (invoice) => {
+        if (!invoice) return;
+
+        setPrintInvoice(invoice);
+        setIsPrintModalOpen(true);
+        setIsPrintLoading(true);
+        setPrintData(null);
+
+        try {
+            const printResponse = await axios.get(
+                route("transactions.print", invoice),
+                {
+                    headers: {
+                        Accept: "application/json",
+                    },
+                },
+            );
+
+            setPrintData(printResponse?.data ?? null);
+        } catch (error) {
+            toast.error("Gagal memuat nota");
+        } finally {
+            setIsPrintLoading(false);
+        }
     };
 
     const rows = transactions?.data ?? [];
@@ -367,22 +400,18 @@ const History = ({
                                                 </td>
                                             )}
                                             <td className="px-4 py-4 text-center">
-                                                <Link
-                                                    href={route(
-                                                        "transactions.print",
-                                                        {
-                                                            invoice:
-                                                                transaction.invoice,
-                                                            backUrl: route(
-                                                                "transactions.history",
-                                                            ),
-                                                        },
-                                                    )}
+                                                <button
+                                                    type="button"
+                                                    onClick={() =>
+                                                        handleOpenPrintPreview(
+                                                            transaction.invoice,
+                                                        )
+                                                    }
                                                     className="inline-flex items-center justify-center w-8 h-8 rounded-lg text-slate-500 hover:text-primary-600 hover:bg-primary-50 dark:hover:bg-primary-950/50 transition-colors"
                                                     title="Cetak Struk"
                                                 >
                                                     <IconPrinter size={18} />
-                                                </Link>
+                                                </button>
                                             </td>
                                         </tr>
                                     ))}
@@ -413,6 +442,44 @@ const History = ({
 
                 {links.length > 3 && <Pagination links={links} />}
             </div>
+
+            {isPrintModalOpen && printInvoice && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 min-[800px]:p-12">
+                    <div
+                        className="absolute inset-0 bg-slate-900/60"
+                        onClick={() => setIsPrintModalOpen(false)}
+                    />
+                    <div className="relative w-full max-w-5xl h-[90vh] bg-white dark:bg-slate-900 rounded-2xl shadow-xl overflow-hidden border border-slate-200 dark:border-slate-800">
+                        <div className="flex items-center justify-between px-4 py-3 border-b border-slate-200 dark:border-slate-800">
+                            <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-200">
+                                Pratinjau Nota
+                            </h3>
+                            <button
+                                onClick={() => setIsPrintModalOpen(false)}
+                                className="text-sm text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
+                            >
+                                Tutup
+                            </button>
+                        </div>
+                        <div className="h-[calc(90vh-52px)] overflow-auto">
+                            {isPrintLoading && (
+                                <div className="h-full flex items-center justify-center">
+                                    <div className="w-8 h-8 border-2 border-primary-500/30 border-t-primary-500 rounded-full animate-spin" />
+                                </div>
+                            )}
+                            {!isPrintLoading && printData?.transaction && (
+                                <PrintPreview
+                                    transaction={printData.transaction}
+                                    storeSetting={printData.storeSetting}
+                                    onBack={() => setIsPrintModalOpen(false)}
+                                    backLabel="Tutup"
+                                    embedded={true}
+                                />
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
         </>
     );
 };

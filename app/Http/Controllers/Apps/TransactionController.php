@@ -424,6 +424,12 @@ class TransactionController extends Controller
             $paymentSetting = PaymentSetting::first();
 
             if (! $paymentSetting || ! $paymentSetting->isGatewayReady($paymentGateway)) {
+                if ($request->wantsJson()) {
+                    return response()->json([
+                        'message' => 'Gateway pembayaran belum dikonfigurasi.',
+                    ], 422);
+                }
+
                 return redirect()
                     ->route('transactions.index')
                     ->with('error', 'Gateway pembayaran belum dikonfigurasi.');
@@ -541,10 +547,23 @@ class TransactionController extends Controller
                     'payment_url'       => $paymentResponse['payment_url'] ?? null,
                 ]);
             } catch (PaymentGatewayException $exception) {
+                if ($request->wantsJson()) {
+                    return response()->json([
+                        'message' => $exception->getMessage(),
+                    ], 422);
+                }
+
                 return redirect()
                     ->route('transactions.print', [$transaction->invoice, 'backUrl' => route('transactions.index')])
                     ->with('error', $exception->getMessage());
             }
+        }
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'invoice' => $transaction->invoice,
+                'backUrl' => route('transactions.index'),
+            ]);
         }
 
         return to_route('transactions.print', [$transaction->invoice, 'backUrl' => route('transactions.index')]);
@@ -560,6 +579,13 @@ class TransactionController extends Controller
             'store_phone' => null,
             'store_footer' => null,
         ]);
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'transaction' => $transaction,
+                'storeSetting' => $storeSetting,
+            ]);
+        }
 
         return Inertia::render('Transactions/Print', [
             'transaction' => $transaction,

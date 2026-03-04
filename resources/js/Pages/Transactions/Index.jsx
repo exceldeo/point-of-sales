@@ -17,6 +17,7 @@ import NumpadModal from "@/Components/POS/NumpadModal";
 import HeldTransactions, {
     HoldButton,
 } from "@/Components/POS/HeldTransactions";
+import PrintPreview from "@/Components/Receipt/PrintPreview";
 import useBarcodeScanner from "@/Hooks/useBarcodeScanner";
 import { getProductImageUrl } from "@/Utils/imageUrl";
 import {
@@ -71,6 +72,10 @@ export default function Index({
     const [numpadOpen, setNumpadOpen] = useState(false);
     const [showShortcuts, setShowShortcuts] = useState(false);
     const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
+    const [isPrintModalOpen, setIsPrintModalOpen] = useState(false);
+    const [printInvoice, setPrintInvoice] = useState(null);
+    const [printData, setPrintData] = useState(null);
+    const [isPrintLoading, setIsPrintLoading] = useState(false);
 
     // Ref for search input to enable keyboard focus
     const searchInputRef = useRef(null);
@@ -315,7 +320,7 @@ export default function Index({
     };
 
     // Handle submit transaction
-    const handleSubmitTransaction = () => {
+    const handleSubmitTransaction = async () => {
         if (carts.length === 0) {
             toast.error("Keranjang masih kosong");
             return;
@@ -332,35 +337,70 @@ export default function Index({
 
         setIsSubmitting(true);
 
-        router.post(
-            route("transactions.store"),
-            {
-                customer_id: selectedCustomer?.id || null,
-                user_id: selectedUserId ? Number(selectedUserId) : null,
-                discount,
-                grand_total: payable,
-                cash: isCashPayment ? cashValue : payable,
-                change: isCashPayment ? Math.max(cashValue - payable, 0) : 0,
-                payment_gateway: isCashPayment ? null : paymentMethod,
-            },
-            {
-                onSuccess: () => {
-                    setDiscountInput("");
-                    setCashInput("");
-                    setSelectedCustomer(null);
-                    setSelectedUserId("");
-                    setPaymentMethod(defaultPaymentGateway ?? "cash");
-                    setIsPaymentModalOpen(false);
-                    setIsSubmitting(false);
-                    carts = [];
-                    toast.success("Transaksi berhasil!");
+        try {
+            const response = await axios.post(
+                route("transactions.store"),
+                {
+                    customer_id: selectedCustomer?.id || null,
+                    user_id: selectedUserId ? Number(selectedUserId) : null,
+                    discount,
+                    grand_total: payable,
+                    cash: isCashPayment ? cashValue : payable,
+                    change: isCashPayment
+                        ? Math.max(cashValue - payable, 0)
+                        : 0,
+                    payment_gateway: isCashPayment ? null : paymentMethod,
                 },
-                onError: () => {
-                    setIsSubmitting(false);
-                    toast.error("Gagal menyimpan transaksi");
+                {
+                    headers: {
+                        Accept: "application/json",
+                    },
                 },
-            },
-        );
+            );
+
+            const invoice = response?.data?.invoice || null;
+
+            setDiscountInput("");
+            setCashInput("");
+            setSelectedCustomer(null);
+            setSelectedUserId("");
+            setPaymentMethod(defaultPaymentGateway ?? "cash");
+            setIsPaymentModalOpen(false);
+            toast.success("Transaksi berhasil!");
+            router.reload({ only: ["carts", "carts_total", "heldCarts"] });
+
+            if (invoice) {
+                setPrintInvoice(invoice);
+                setIsPrintModalOpen(true);
+                setIsPrintLoading(true);
+                setPrintData(null);
+
+                try {
+                    const printResponse = await axios.get(
+                        route("transactions.print", invoice),
+                        {
+                            headers: {
+                                Accept: "application/json",
+                            },
+                        },
+                    );
+
+                    setPrintData(printResponse?.data ?? null);
+                } catch (printError) {
+                    toast.error("Gagal memuat nota");
+                } finally {
+                    setIsPrintLoading(false);
+                }
+            }
+        } catch (error) {
+            const message =
+                error?.response?.data?.message ||
+                error?.response?.data?.errors?.[0] ||
+                "Gagal menyimpan transaksi";
+            toast.error(message);
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     const handleOpenPaymentModal = () => {
@@ -874,6 +914,44 @@ export default function Index({
                                     "Create Transaction"
                                 )}
                             </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {isPrintModalOpen && printInvoice && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 min-[800px]:p-12">
+                    <div
+                        className="absolute inset-0 bg-slate-900/60"
+                        onClick={() => setIsPrintModalOpen(false)}
+                    />
+                    <div className="relative w-full max-w-5xl h-[90vh] bg-white dark:bg-slate-900 rounded-2xl shadow-xl overflow-hidden border border-slate-200 dark:border-slate-800">
+                        <div className="flex items-center justify-between px-4 py-3 border-b border-slate-200 dark:border-slate-800">
+                            <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-200">
+                                Pratinjau Nota
+                            </h3>
+                            <button
+                                onClick={() => setIsPrintModalOpen(false)}
+                                className="text-sm text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
+                            >
+                                Tutup
+                            </button>
+                        </div>
+                        <div className="h-[calc(90vh-52px)] overflow-auto">
+                            {isPrintLoading && (
+                                <div className="h-full flex items-center justify-center">
+                                    <div className="w-8 h-8 border-2 border-primary-500/30 border-t-primary-500 rounded-full animate-spin" />
+                                </div>
+                            )}
+                            {!isPrintLoading && printData?.transaction && (
+                                <PrintPreview
+                                    transaction={printData.transaction}
+                                    storeSetting={printData.storeSetting}
+                                    onBack={() => setIsPrintModalOpen(false)}
+                                    backLabel="Tutup"
+                                    embedded={true}
+                                />
+                            )}
                         </div>
                     </div>
                 </div>
