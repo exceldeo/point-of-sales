@@ -15,6 +15,7 @@ export default function ThermalReceipt({
     storeName = "TOKO ANDA",
     storeAddress = "",
     storePhone = "",
+    storeFooter = "",
 }) {
     const formatPrice = (price = 0) => {
         return "Rp " + Number(price || 0).toLocaleString("id-ID");
@@ -50,6 +51,13 @@ export default function ThermalReceipt({
     // Line separator
     const line = "=".repeat(32);
     const dashLine = "-".repeat(32);
+    const footerLines = storeFooter
+        ? storeFooter.split(/\r?\n/).filter(Boolean)
+        : [
+              "Terima kasih",
+              "Barang yang sudah dibeli",
+              "tidak dapat ditukar/dikembalikan",
+          ];
 
     return (
         <div
@@ -150,9 +158,11 @@ export default function ThermalReceipt({
 
             {/* Footer */}
             <div className="text-center mt-2">
-                <p className="text-xs">Terima kasih</p>
-                <p className="text-xs">Barang yang sudah dibeli</p>
-                <p className="text-xs">tidak dapat ditukar/dikembalikan</p>
+                {footerLines.map((line, index) => (
+                    <p key={index} className="text-xs">
+                        {line}
+                    </p>
+                ))}
             </div>
 
             {/* Print-specific styles */}
@@ -182,6 +192,7 @@ export function ThermalReceipt58mm({
     storeName = "TOKO",
     storeAddress = "",
     storePhone = "",
+    storeFooter = "",
 }) {
     const formatPrice = (price = 0) => {
         return "Rp" + Number(price || 0).toLocaleString("id-ID");
@@ -198,6 +209,9 @@ export function ThermalReceipt58mm({
 
     const items = transaction?.details ?? [];
     const line = "-".repeat(24);
+    const footerLines = storeFooter
+        ? storeFooter.split(/\r?\n/).filter(Boolean)
+        : ["Terima kasih!"];
 
     return (
         <div
@@ -239,7 +253,11 @@ export function ThermalReceipt58mm({
                 <span>{formatPrice(transaction?.change)}</span>
             </div>
             <pre>{line}</pre>
-            <p className="text-center">Terima kasih!</p>
+            {footerLines.map((line, index) => (
+                <p key={index} className="text-center">
+                    {line}
+                </p>
+            ))}
 
             <style>{`
                 @media print {

@@ -558,6 +558,7 @@ class TransactionController extends Controller
             'store_name' => 'TOKO ANDA',
             'store_address' => null,
             'store_phone' => null,
+            'store_footer' => null,
         ]);
 
         return Inertia::render('Transactions/Print', [

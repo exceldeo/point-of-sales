@@ -17,6 +17,7 @@ export default function Print({ transaction, storeSetting, backUrl = null }) {
     const storeName = storeSetting?.store_name || "TOKO ANDA";
     const storeAddress = storeSetting?.store_address || "";
     const storePhone = storeSetting?.store_phone || "";
+    const storeFooter = storeSetting?.store_footer || "";
 
     const formatPrice = (price = 0) =>
         Number(price || 0).toLocaleString("id-ID", {
@@ -185,6 +186,7 @@ export default function Print({ transaction, storeSetting, backUrl = null }) {
                                         storeName={storeName}
                                         storeAddress={storeAddress}
                                         storePhone={storePhone}
+                                        storeFooter={storeFooter}
                                     />
                                 ) : (
                                     <ThermalReceipt58mm
@@ -192,6 +194,7 @@ export default function Print({ transaction, storeSetting, backUrl = null }) {
                                         storeName={storeName}
                                         storeAddress={storeAddress}
                                         storePhone={storePhone}
+                                        storeFooter={storeFooter}
                                     />
                                 )}
                             </div>
@@ -397,9 +400,15 @@ export default function Print({ transaction, storeSetting, backUrl = null }) {
 
                             {/* Footer */}
                             <div className="px-6 py-4 text-center border-t border-slate-100 dark:border-slate-800">
-                                <p className="text-xs text-slate-400 dark:text-slate-500 uppercase tracking-widest">
-                                    Terima kasih telah berbelanja
-                                </p>
+                                {storeFooter ? (
+                                    <p className="text-xs text-slate-400 dark:text-slate-500 whitespace-pre-line">
+                                        {storeFooter}
+                                    </p>
+                                ) : (
+                                    <p className="text-xs text-slate-400 dark:text-slate-500 uppercase tracking-widest">
+                                        Terima kasih telah berbelanja
+                                    </p>
+                                )}
                             </div>
                         </div>
                     )}
