@@ -16,6 +16,8 @@ class StoreSettingSeeder extends Seeder
             'store_name' => 'TOKO ANDA',
             'store_address' => null,
             'store_phone' => null,
+            'store_footer' => null,
+            'is_edited' => false,
         ]);
     }
 }

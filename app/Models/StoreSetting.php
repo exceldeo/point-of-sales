@@ -13,5 +13,7 @@ class StoreSetting extends Model
         'store_name',
         'store_address',
         'store_phone',
+        'store_footer',
+        'is_edited',
     ];
 }

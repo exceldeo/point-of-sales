@@ -13,7 +13,10 @@ export default function Store({ setting }) {
         store_name: setting?.store_name ?? "TOKO ANDA",
         store_address: setting?.store_address ?? "",
         store_phone: setting?.store_phone ?? "",
+        store_footer: setting?.store_footer ?? "",
     });
+
+    const isStoreNameLocked = Boolean(setting?.is_edited);
 
     useEffect(() => {
         if (flash?.success) toast.success(flash.success);
@@ -22,7 +25,11 @@ export default function Store({ setting }) {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        put(route("settings.store.update"), { preserveScroll: true });
+        put(route("settings.store.update"), {
+            preserveScroll: true,
+            onSuccess: () =>
+                toast.success("Pengaturan toko berhasil disimpan."),
+        });
     };
 
     return (
@@ -48,7 +55,13 @@ export default function Store({ setting }) {
                         onChange={(e) => setData("store_name", e.target.value)}
                         errors={errors?.store_name}
                         placeholder="Masukkan nama toko"
+                        disabled={isStoreNameLocked}
                     />
+                    {isStoreNameLocked && (
+                        <p className="text-xs text-slate-500 dark:text-slate-400">
+                            Nama toko sudah dikunci dan tidak bisa diubah.
+                        </p>
+                    )}
 
                     <Textarea
                         label="Alamat Toko"
@@ -68,6 +81,17 @@ export default function Store({ setting }) {
                         onChange={(e) => setData("store_phone", e.target.value)}
                         errors={errors?.store_phone}
                         placeholder="08xxxxxxxxxx"
+                    />
+
+                    <Textarea
+                        label="Footer Nota"
+                        value={data.store_footer}
+                        onChange={(e) =>
+                            setData("store_footer", e.target.value)
+                        }
+                        errors={errors?.store_footer}
+                        placeholder="Tambahkan footer nota (baris baru akan dipisah otomatis)"
+                        rows={3}
                     />
                 </div>
 
